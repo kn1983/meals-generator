@@ -35,9 +35,6 @@ const MyCoolNavbar = () => {
         <li>
           <MyCoolNavbarLink href="/meals">Meals</MyCoolNavbarLink>
         </li>
-        <li>
-          <MyCoolNavbarLink href="/myCoolPage">My cool page</MyCoolNavbarLink>
-        </li>
       </ul>
     </nav>
   );
