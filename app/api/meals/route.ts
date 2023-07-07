@@ -1,43 +1,39 @@
-import { NextResponse } from 'next/server';
+import clientPromise from "@/lib/mongodb";
+import { MongoClient } from "mongodb";
+import { NextResponse } from "next/server";
 
-const meals = [
-    {
-        "id": "aasf",
-        "title": "Röd curry",
-        "author": "Klara"
-    },
-    {
-        "id": "ghjkghjk",
-        "title": "Stroganoff",
-        "author": "Klara"
-    },
-    {
-        "id": "xcvbxb",
-        "title": "Broccolipaj",
-        "author": "Klara"
-    },
-    {
-        "id": "yuioyo",
-        "title": "Spaghetti med köttfärssås",
-        "author": "Klara"
-    },
-    {
-        "id": "aasf",
-        "title": "Ris med currysås och kyckling",
-        "author": "Klara"
-    },
-    {
-        "id": "mnbvxc",
-        "title": "Falaffel med bröd",
-        "author": "Klara"
-    },
-    {
-        "id": "efgvfg",
-        "title": "Tacos",
-        "author": "Klara"
-    }
-]
- 
-export async function GET(request: Request) { 
-    return NextResponse.json(meals);
+export async function GET(request: Request) {
+  let data = null;
+  try {
+    const client: MongoClient = await clientPromise;
+    const db = client.db("mealsGenerator");
+
+    data = await db
+      .collection("meals")
+      .aggregate([
+        {
+          $lookup: {
+            from: "users", // Specify the collection to join
+            localField: "author", // Field from the articles collection
+            foreignField: "_id", // Field from the users collection
+            as: "user", // Output array field
+          },
+        },
+        {
+          $unwind: "$user", // Deconstruct user array
+        },
+        {
+          $project: {
+            // Choose fields to include
+            _id: 1,
+            title: 1,
+            authorName: "$user.userName",
+          },
+        },
+      ])
+      .toArray();
+  } catch (e) {
+    data = { error: e };
+  }
+  return NextResponse.json(data);
 }

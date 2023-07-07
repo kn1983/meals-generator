@@ -1,6 +1,6 @@
 interface Meal {
   id: string;
-  author: string;
+  authorName: string;
   title: string;
 }
 
@@ -18,11 +18,16 @@ export default async function Page() {
 
   return (
     <div>
-      <h1 className="text-3xl">Meals</h1>
+      <h1 className="text-3xl mb-4">Meals</h1>
       {meals?.length > 0 && (
         <ul>
           {meals.map((meal, index) => {
-            return <li>{meal.title}</li>;
+            return (
+              <li className="mb-6">
+                <div className="mb-1">{meal.title}</div>
+                <div className="text-xs italic">Author: {meal.authorName}</div>
+              </li>
+            );
           })}
         </ul>
       )}
