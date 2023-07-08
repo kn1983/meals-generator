@@ -1,7 +1,9 @@
+import { MainTitle } from "./components/MainTitle/MainTitle";
+
 export default function Home() {
   return (
     <div>
-      <h1>My cool homepage</h1>
+      <MainTitle title="Generate meals" />
     </div>
   );
 }
