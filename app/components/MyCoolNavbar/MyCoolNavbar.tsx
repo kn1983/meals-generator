@@ -33,6 +33,9 @@ const MyCoolNavbar = () => {
           <MyCoolNavbarLink href="/">Home</MyCoolNavbarLink>
         </li>
         <li>
+          <MyCoolNavbarLink href="/addMeal">Add meal</MyCoolNavbarLink>
+        </li>
+        <li>
           <MyCoolNavbarLink href="/meals">Meals</MyCoolNavbarLink>
         </li>
       </ul>

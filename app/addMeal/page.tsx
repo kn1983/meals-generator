@@ -1,0 +1,28 @@
+import React, { FormEvent, RefObject, useRef } from "react";
+import { MainTitle } from "../components/MainTitle/MainTitle";
+import { AddMealsForm } from "../components/AddMealForm/AddMealForm";
+
+export interface User {
+  _id: string;
+  userName: string;
+}
+
+const fetchUsers = async (): Promise<User[]> => {
+  const res = await fetch("http://localhost:3000/api/users");
+
+  if (!res.ok) {
+    throw new Error("Failed to fetch users");
+  }
+  return res.json();
+};
+
+export default async function Page() {
+  const users: User[] = await fetchUsers();
+
+  return (
+    <div>
+      <MainTitle title="Add meal" />
+      <AddMealsForm users={users} />
+    </div>
+  );
+}

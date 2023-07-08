@@ -17,7 +17,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <main className="container mx-auto">
+        <main className="container mx-auto p-4">
           <div className="text-3xl uppercase tracking-wide py-4">
             Meals generator
           </div>

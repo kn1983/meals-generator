@@ -1,3 +1,5 @@
+import { MainTitle } from "../components/MainTitle/MainTitle";
+
 interface Meal {
   id: string;
   authorName: string;
@@ -18,10 +20,10 @@ export default async function Page() {
 
   return (
     <div>
-      <h1 className="text-3xl mb-4">Meals</h1>
+      <MainTitle title="Meals" />
       {meals?.length > 0 && (
         <ul>
-          {meals.map((meal, index) => {
+          {meals.map((meal) => {
             return (
               <li className="mb-6">
                 <div className="mb-1">{meal.title}</div>
