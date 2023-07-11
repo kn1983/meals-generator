@@ -1,7 +1,7 @@
 import { MainTitle } from "../components/MainTitle/MainTitle";
 
-interface Meal {
-  id: string;
+export interface Meal {
+  _id: string;
   authorName: string;
   title: string;
 }
@@ -12,6 +12,7 @@ const fetchMeals = async (): Promise<Meal[]> => {
   if (!res.ok) {
     throw new Error("Failed to fetch meals");
   }
+  console.log("ITS WORKING");
   return res.json();
 };
 
@@ -25,7 +26,7 @@ export default async function Page() {
         <ul>
           {meals.map((meal) => {
             return (
-              <li className="mb-6">
+              <li className="mb-6" key={meal._id}>
                 <div className="mb-1">{meal.title}</div>
                 <div className="text-xs italic">Author: {meal.authorName}</div>
               </li>

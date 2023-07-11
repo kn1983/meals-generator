@@ -3,9 +3,11 @@
 import { User } from "@/app/addMeal/page";
 import { FormEvent, RefObject, useRef } from "react";
 import { Label } from "../formElements/Label/Label";
-import { Input } from "../formElements/Input/Input";
+import { Input, InputType } from "../formElements/Input/Input";
 import { Select, SelectListItemProps } from "../formElements/Select/Select";
 import { PrimaryButton } from "../buttons/PrimaryButton/PrimaryButton";
+import { FormElementWrapper } from "../formElements/FormElementWrapper/FormElementWrapper";
+import { FormWrapper } from "../formElements/FormWrapper/FormWrapper";
 
 interface AddMealsFormProps {
   users: User[];
@@ -58,20 +60,23 @@ const AddMealsForm = ({ users }: AddMealsFormProps) => {
     ];
   };
 
+  console.log("RE render add meal form");
+
   return (
     <div className="flex">
-      <form className="w-full" onSubmit={handleSubmitMeal}>
-        <div className="w-full md:w-3/5">
-          <div className="mb-6">
+      <FormWrapper>
+        <form className="w-full" onSubmit={handleSubmitMeal}>
+          <FormElementWrapper>
             <Label htmlFor="meal" labelText="Meal" />
             <Input
+              type={InputType.TEXT}
               name="meal"
               id="meal"
               reference={mealRef}
               placeholder="Meal"
             />
-          </div>
-          <div className="mb-6">
+          </FormElementWrapper>
+          <FormElementWrapper>
             <Label htmlFor="author" labelText="Author" />
             {users?.length > 0 && (
               <Select
@@ -81,10 +86,10 @@ const AddMealsForm = ({ users }: AddMealsFormProps) => {
                 reference={authorRef}
               />
             )}
-          </div>
+          </FormElementWrapper>
           <PrimaryButton type="submit" text="Add meal" />
-        </div>
-      </form>
+        </form>
+      </FormWrapper>
     </div>
   );
 };

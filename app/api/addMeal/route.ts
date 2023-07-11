@@ -1,10 +1,10 @@
 import clientPromise from "@/lib/mongodb";
-import { InsertOneResult, MongoClient, ObjectId } from "mongodb";
+import { MongoClient, ObjectId } from "mongodb";
 import { NextResponse } from "next/server";
 
 export async function POST(request: Request) {
   let data = null;
-  let statusCode: number;
+
   try {
     const client: MongoClient = await clientPromise;
     const db = client.db("mealsGenerator");
