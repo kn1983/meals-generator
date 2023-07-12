@@ -27,6 +27,7 @@ const Input = ({
   minValue,
   defaultValue,
   onKeyDown,
+  onChange,
 }: InputProps) => {
   return (
     <input
@@ -39,6 +40,7 @@ const Input = ({
       min={minValue}
       defaultValue={defaultValue}
       onKeyDown={onKeyDown}
+      onChange={onChange}
     />
   );
 };
