@@ -1,5 +1,4 @@
 import { Tag } from "@/app/randomizeMeals/page";
-import { FormElementWrapper } from "../formElements/FormElementWrapper/FormElementWrapper";
 import { Input, InputType } from "../formElements/Input/Input";
 import { Label } from "../formElements/Label/Label";
 import React, { RefObject, useRef, useState } from "react";
@@ -52,25 +51,60 @@ const ManageTags = ({
 }) => {
   const [matchingTags, setMatchingTags] = useState<Tag[]>([]);
   const tagsInputRef: RefObject<HTMLInputElement> = useRef(null);
-  const tagOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const inputValue = event.target.value;
-    if (inputValue === "") {
-      return setMatchingTags([]);
-    }
-    const matchingTags = allTags.filter(
+  const checkMatchingTags = (tagString: string): Tag[] =>
+    allTags.filter(
       (tag) =>
-        tag.tagName.toLowerCase().includes(inputValue.toLowerCase()) &&
+        tag.tagName.toLowerCase().includes(tagString.toLowerCase()) &&
         !itemTags.find((itemTag) => itemTag === tag._id)
     );
-    setMatchingTags(matchingTags);
-  };
 
-  const tagSuggestionOnClick = (tagId: string) => {
+  const addTag = (tagId: string) => {
     addTagToMealItem({ tagId: tagId, mealId });
     if (tagsInputRef?.current) {
       tagsInputRef.current.value = "";
       setMatchingTags([]);
     }
+  };
+
+  const addTagByTypeComma = (inputValue: string) => {
+    const tagToAdd = inputValue.split(",")[0];
+    if (tagToAdd === "") {
+      return;
+    }
+    const matchingTags = checkMatchingTags(tagToAdd.toLocaleLowerCase());
+    if (matchingTags.length === 1) {
+      addTagToMealItem({ tagId: matchingTags[0]._id, mealId });
+      resetTagInputAndSuggestions();
+    } else {
+      console.log("No suggestion or more than one");
+    }
+  };
+
+  const tagOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const inputValue = event.target.value;
+    const lastCharacter = inputValue.slice(-1);
+
+    if (lastCharacter === ",") {
+      return addTagByTypeComma(inputValue);
+    }
+
+    if (inputValue === "") {
+      return setMatchingTags([]);
+    }
+    const matchingTags = checkMatchingTags(inputValue.toLowerCase());
+    setMatchingTags(matchingTags);
+  };
+
+  const resetTagInputAndSuggestions = () => {
+    if (tagsInputRef?.current) {
+      tagsInputRef.current.value = "";
+      setMatchingTags([]);
+    }
+  };
+
+  const tagSuggestionOnClick = (tagId: string) => {
+    addTagToMealItem({ tagId: tagId, mealId });
+    resetTagInputAndSuggestions();
   };
 
   return (
