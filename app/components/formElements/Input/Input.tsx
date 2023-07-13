@@ -8,7 +8,6 @@ export enum InputType {
 interface InputProps {
   type: InputType;
   name: string;
-  id: string;
   placeholder?: string;
   reference?: RefObject<HTMLInputElement>;
   defaultValue?: string | number;
@@ -21,7 +20,6 @@ interface InputProps {
 const Input = ({
   type,
   name,
-  id,
   placeholder,
   reference,
   minValue,
@@ -33,7 +31,6 @@ const Input = ({
     <input
       type={type}
       name={name}
-      id={id}
       className="block w-full p-2 text-black leading-none border-1"
       ref={reference}
       placeholder={placeholder}

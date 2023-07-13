@@ -42,7 +42,6 @@ const SimpleRandomizeMealsForm = () => {
                 type={InputType.NUMBER}
                 defaultValue={5}
                 name="mealsCount"
-                id="mealsCount"
                 reference={mealsCountRef}
                 onKeyDown={onKeyDown}
               />

@@ -8,7 +8,6 @@ export interface SelectListItemProps {
 
 interface SelectProps {
   items: SelectListItemProps[];
-  id: string;
   name: string;
   reference?: RefObject<HTMLSelectElement>;
   defaultValue?: string;
@@ -16,7 +15,6 @@ interface SelectProps {
 }
 const Select = ({
   items,
-  id,
   name,
   reference,
   defaultValue,
@@ -27,7 +25,6 @@ const Select = ({
   }
   return (
     <select
-      id={id}
       name={name}
       className="bg-blue-800 block p-2 leading-none"
       ref={reference}

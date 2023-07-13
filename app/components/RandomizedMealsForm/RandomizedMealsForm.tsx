@@ -4,7 +4,7 @@ import { MealSettings } from "../MealSettings/MealSettings";
 import { FormElementWrapper } from "../formElements/FormElementWrapper/FormElementWrapper";
 import { Label } from "../formElements/Label/Label";
 import { Select, SelectListItemProps } from "../formElements/Select/Select";
-import { DifficultyLevel } from "@/app/randomizeMeals/page";
+import { DifficultyLevel, Tag } from "@/app/randomizeMeals/page";
 
 export interface MealItem {
   itemId: string;
@@ -17,6 +17,12 @@ interface RandomizedMealsFormProps {
   initialMeals: MealItem[];
   difficultyLevels: DifficultyLevel[];
   defaultLevel: string;
+  allTags: Tag[];
+}
+
+export interface AddTagToMealItemArgs {
+  mealId: string;
+  tagId: string;
 }
 
 const RandomizedMealsForm = ({
@@ -24,6 +30,7 @@ const RandomizedMealsForm = ({
   initialMeals,
   difficultyLevels,
   defaultLevel,
+  allTags,
 }: RandomizedMealsFormProps) => {
   const [mealItems, setMealItems] = useState<MealItem[]>(initialMeals);
   const daysRef: RefObject<HTMLSelectElement> = useRef(null);
@@ -82,13 +89,30 @@ const RandomizedMealsForm = ({
     return itemsArray;
   };
 
+  const addTagToMealItem = ({ mealId, tagId }: AddTagToMealItemArgs) => {
+    const mealIndex = mealItems.findIndex((meal) => meal.itemId === mealId);
+    const newMealItems: MealItem[] = [...mealItems];
+    newMealItems[mealIndex].tags.push(tagId);
+    setMealItems(newMealItems);
+  };
+
+  // const tagOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+  //   const attributeName = event.target.getAttribute("name");
+  //   const mealId = attributeName?.split("_")[0] || "";
+  //   const mealIndex = mealItems.findIndex((meal) => meal.itemId === mealId);
+  //   const inputValue = event.target.value;
+  //   const matchingTags = allTags.filter((tag) =>
+  //     tag.tagName.toLowerCase().includes(inputValue.toLowerCase())
+  //   );
+  //   console.log(matchingTags);
+  // };
+
   return (
     <>
       <div className="w-1/4">
         <FormElementWrapper>
           <Label htmlFor="days" labelText="How many days" />
           <Select
-            id="days"
             name="days"
             items={renderSelectDaysItems()}
             onChange={daysOnChange}
@@ -105,6 +129,10 @@ const RandomizedMealsForm = ({
               difficultyLevels={difficultyLevels}
               defaultLevel={defaultLevel}
               mealTitle={`Meal ${index + 1}`}
+              allTags={allTags}
+              itemTags={item.tags}
+              mealId={item.itemId}
+              addTagToMealItem={addTagToMealItem}
             />
           );
         })}

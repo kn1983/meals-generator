@@ -71,7 +71,6 @@ const AddMealsForm = ({ users }: AddMealsFormProps) => {
             <Input
               type={InputType.TEXT}
               name="meal"
-              id="meal"
               reference={mealRef}
               placeholder="Meal"
             />
@@ -81,7 +80,6 @@ const AddMealsForm = ({ users }: AddMealsFormProps) => {
             {users?.length > 0 && (
               <Select
                 items={getSelectListItems(users)}
-                id="author"
                 name="author"
                 reference={authorRef}
               />

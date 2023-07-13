@@ -1,16 +1,14 @@
+import { Tag } from "@/app/randomizeMeals/page";
 import { FormElementWrapper } from "../formElements/FormElementWrapper/FormElementWrapper";
 import { Input, InputType } from "../formElements/Input/Input";
 import { Label } from "../formElements/Label/Label";
-
-interface TagItem {
-  tagId: string;
-  tagName: string;
-}
+import React, { RefObject, useRef, useState } from "react";
+import { AddTagToMealItemArgs } from "../RandomizedMealsForm/RandomizedMealsForm";
 
 const tagWrapperStyles =
   "mr-2 mb-2 flex text-xs rounded tracking-wide leading-none";
 
-const Tag = ({ tag }: { tag: TagItem }) => {
+const TagItem = ({ tag }: { tag: Tag }) => {
   return (
     <span className={`${tagWrapperStyles} pr-0 bg-slate-300 flex`}>
       <span className="pl-2 py-2">{tag.tagName}</span>
@@ -24,32 +22,89 @@ const Tag = ({ tag }: { tag: TagItem }) => {
   );
 };
 
-const AddTags = ({ tags }: { tags: TagItem[] }) => {
+const TagSuggestion = ({
+  tag,
+  tagSuggestionOnClick,
+}: {
+  tag: Tag;
+  tagSuggestionOnClick: (tagId: string) => void;
+}) => {
+  return (
+    <button
+      className={`${tagWrapperStyles} pr-2 bg-blue-800 hover:bg-blue-900 text-white`}
+      onClick={() => tagSuggestionOnClick(tag._id)}
+    >
+      <span className="pl-2 py-2">{tag.tagName}</span>
+    </button>
+  );
+};
+
+const ManageTags = ({
+  itemTags,
+  mealId,
+  allTags,
+  addTagToMealItem,
+}: {
+  itemTags: string[];
+  allTags: Tag[];
+  mealId: string;
+  addTagToMealItem: (args: AddTagToMealItemArgs) => void;
+}) => {
+  const [matchingTags, setMatchingTags] = useState<Tag[]>([]);
+  const tagsInputRef: RefObject<HTMLInputElement> = useRef(null);
+  const tagOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const inputValue = event.target.value;
+    if (inputValue === "") {
+      return setMatchingTags([]);
+    }
+    const matchingTags = allTags.filter((tag) =>
+      tag.tagName.toLowerCase().includes(inputValue.toLowerCase())
+    );
+    setMatchingTags(matchingTags);
+  };
+
+  const tagSuggestionOnClick = (tagId: string) => {
+    addTagToMealItem({ tagId: tagId, mealId });
+    if (tagsInputRef?.current) {
+      tagsInputRef.current.value = "";
+      setMatchingTags([]);
+    }
+  };
+
   return (
     <div>
       <div className="mb-3">
         <Label htmlFor="tags" labelText="Tags" />
         <div className="text-black flex flex-wrap mb-1">
-          {tags.map((tag) => {
-            return <Tag tag={tag} />;
+          {itemTags.map((tagId) => {
+            const tagItem: Tag | undefined = allTags.find(
+              (tag) => tag._id === tagId
+            );
+
+            return tagItem && <TagItem tag={tagItem} key={tagItem._id} />;
           })}
         </div>
-        <Input type={InputType.TEXT} name="tags" id="tags" placeholder="Tags" />
+        <Input
+          type={InputType.TEXT}
+          name="tags"
+          placeholder="Tags"
+          onChange={tagOnChange}
+          reference={tagsInputRef}
+        />
       </div>
       <div className="text-black flex flex-wrap mb-1">
-        <button
-          className={`${tagWrapperStyles} pr-2 bg-blue-800 hover:bg-blue-900 text-white`}
-        >
-          <span className="pl-2 py-2">Tag suggestion</span>
-        </button>
-        <button
-          className={`${tagWrapperStyles} pr-2 bg-blue-800 hover:bg-blue-900 text-white`}
-        >
-          <span className="pl-2 py-2">Tag suggestion</span>
-        </button>
+        {matchingTags.map((tagSuggestion) => {
+          return (
+            <TagSuggestion
+              tag={tagSuggestion}
+              key={tagSuggestion._id}
+              tagSuggestionOnClick={tagSuggestionOnClick}
+            />
+          );
+        })}
       </div>
     </div>
   );
 };
 
-export { AddTags };
+export { ManageTags };

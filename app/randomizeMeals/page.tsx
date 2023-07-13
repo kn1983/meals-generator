@@ -1,4 +1,3 @@
-import { StringMappingType } from "typescript";
 import { MainTitle } from "../components/MainTitle/MainTitle";
 import {
   MealItem,
@@ -8,6 +7,11 @@ import {
 export interface DifficultyLevel {
   _id: string;
   level: string;
+}
+
+export interface Tag {
+  _id: string;
+  tagName: string;
 }
 
 export default async function Page() {
@@ -20,6 +24,14 @@ export default async function Page() {
       throw new Error("Failed to fetch difficulty levels");
     }
 
+    return res.json();
+  };
+
+  const fetchTags = async (): Promise<Tag[]> => {
+    const res = await fetch("http://localhost:3000/api/tags");
+    if (!res.ok) {
+      throw new Error("Failed to fetch tags");
+    }
     return res.json();
   };
 
@@ -44,6 +56,7 @@ export default async function Page() {
   const defaultLevel =
     difficultyLevels.find((item) => item.level === "Easy")?._id || "";
   const initialMeals = generateInitialMeals(initialMealsCount, defaultLevel);
+  const allTags = await fetchTags();
 
   return (
     <div>
@@ -53,6 +66,7 @@ export default async function Page() {
         initialMealsCount={initialMealsCount}
         difficultyLevels={difficultyLevels}
         defaultLevel={defaultLevel}
+        allTags={allTags}
       />
     </div>
   );

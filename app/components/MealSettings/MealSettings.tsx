@@ -1,46 +1,28 @@
-import { DifficultyLevel } from "@/app/randomizeMeals/page";
-import { AddTags } from "../ManageTags/ManageTags";
+import { DifficultyLevel, Tag } from "@/app/randomizeMeals/page";
+import { ManageTags } from "../ManageTags/ManageTags";
 import { FormElementWrapper } from "../formElements/FormElementWrapper/FormElementWrapper";
 import { Label } from "../formElements/Label/Label";
 import { Select } from "../formElements/Select/Select";
-
-const tags = [
-  {
-    tagId: "asdfafs",
-    tagName: "Vegetariskt",
-  },
-  {
-    tagId: "dfgh",
-    tagName: "Kött",
-  },
-  {
-    tagId: "vbmnv",
-    tagName: "Helgmat",
-  },
-  {
-    tagId: "zxcv",
-    tagName: "Soppa",
-  },
-  {
-    tagId: "yuio",
-    tagName: "Fisk",
-  },
-  {
-    tagId: "sdfgs",
-    tagName: "Kinesiskt",
-  },
-];
+import { AddTagToMealItemArgs } from "../RandomizedMealsForm/RandomizedMealsForm";
 
 interface MealSettingsProps {
   difficultyLevels: DifficultyLevel[];
   defaultLevel: string;
   mealTitle: string;
+  allTags: Tag[];
+  itemTags: string[];
+  mealId: string;
+  addTagToMealItem: (args: AddTagToMealItemArgs) => void;
 }
 
 const MealSettings = ({
   difficultyLevels,
   defaultLevel,
   mealTitle,
+  allTags,
+  itemTags,
+  mealId,
+  addTagToMealItem,
 }: MealSettingsProps) => {
   const difficultyLevelItems = difficultyLevels.map((item, index) => {
     return {
@@ -56,13 +38,17 @@ const MealSettings = ({
       <FormElementWrapper>
         <Label htmlFor="difficultyLevel" labelText="Difficulty level" />
         <Select
-          id="difficultyLevel"
           name="difficultyLevel"
           items={difficultyLevelItems}
           defaultValue={defaultLevel}
         />
       </FormElementWrapper>
-      {/* <AddTags tags={tags} /> */}
+      <ManageTags
+        itemTags={itemTags}
+        allTags={allTags}
+        mealId={mealId}
+        addTagToMealItem={addTagToMealItem}
+      />
     </div>
   );
 };
