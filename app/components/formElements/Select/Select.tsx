@@ -4,7 +4,6 @@ export interface SelectListItemProps {
   value: string;
   key: string;
   text: string;
-  selected?: boolean;
 }
 
 interface SelectProps {
@@ -12,9 +11,17 @@ interface SelectProps {
   id: string;
   name: string;
   reference?: RefObject<HTMLSelectElement>;
+  defaultValue?: string;
   onChange?: (event: React.ChangeEvent<HTMLSelectElement>) => void;
 }
-const Select = ({ items, id, name, reference, onChange }: SelectProps) => {
+const Select = ({
+  items,
+  id,
+  name,
+  reference,
+  defaultValue,
+  onChange,
+}: SelectProps) => {
   {
     items.length == 0 && null;
   }
@@ -24,11 +31,12 @@ const Select = ({ items, id, name, reference, onChange }: SelectProps) => {
       name={name}
       className="bg-blue-800 block p-2 leading-none"
       ref={reference}
+      defaultValue={defaultValue}
       onChange={onChange}
     >
       {items.map((item) => {
         return (
-          <option value={item.value} key={item.key} selected={item.selected}>
+          <option value={item.value} key={item.key}>
             {item.text}
           </option>
         );

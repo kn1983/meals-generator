@@ -2,18 +2,25 @@
 import { RefObject, useRef, useState } from "react";
 import { MealSettings } from "../MealSettings/MealSettings";
 import { FormElementWrapper } from "../formElements/FormElementWrapper/FormElementWrapper";
-import { Input, InputType } from "../formElements/Input/Input";
 import { Label } from "../formElements/Label/Label";
 import { Select, SelectListItemProps } from "../formElements/Select/Select";
 
-interface MealItemSettings {
-  id: string;
+export interface MealItem {
+  itemId: string;
+  tags: string[];
+  difficulityLevel: string;
 }
 
-const RandomizedMealsForm = () => {
-  const [mealItemsSettings, setMealItemsSettings] = useState<
-    MealItemSettings[]
-  >([]);
+interface RandomizedMealsFormProps {
+  initialMealsCount: number;
+  initialMeals: MealItem[];
+}
+
+const RandomizedMealsForm = ({
+  initialMealsCount,
+  initialMeals,
+}: RandomizedMealsFormProps) => {
+  const [mealItems, setMealItem] = useState<MealItem[]>(initialMeals);
 
   const daysRef: RefObject<HTMLSelectElement> = useRef(null);
 
@@ -23,11 +30,11 @@ const RandomizedMealsForm = () => {
 
   const daysOnChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const items = parseInt(e.target.value) || 0;
-    if (items === mealItemsSettings.length) {
+    if (items === mealItems.length) {
       return;
     }
 
-    if (items > mealItemsSettings.length) {
+    if (items > mealItems.length) {
       increaseMealItems(items);
     } else {
       decreaseMealItems(items);
@@ -38,7 +45,6 @@ const RandomizedMealsForm = () => {
 
   const renderSelectItems = (): SelectListItemProps[] => {
     const maxItems = 20;
-
     const itemsArray: SelectListItemProps[] = new Array(maxItems)
       .fill("")
       .map((_, index) => {
@@ -47,10 +53,8 @@ const RandomizedMealsForm = () => {
           key: item,
           value: item,
           text: item,
-          selected: item === "5",
         };
       });
-    console.log(itemsArray);
     return itemsArray;
   };
 
@@ -65,15 +69,14 @@ const RandomizedMealsForm = () => {
             items={renderSelectItems()}
             onChange={daysOnChange}
             reference={daysRef}
+            defaultValue={initialMealsCount.toString()}
           />
         </FormElementWrapper>
       </div>
       <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:justify-between">
-        <MealSettings />
-        <MealSettings />
-        <MealSettings />
-        <MealSettings />
-        <MealSettings />
+        {mealItems.map((item, index) => {
+          return <MealSettings key={item.itemId} />;
+        })}
       </div>
     </>
   );

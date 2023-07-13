@@ -1,17 +1,35 @@
-import { AddTags } from "../components/ManageTags/ManageTags";
 import { MainTitle } from "../components/MainTitle/MainTitle";
-import { MealSettings } from "../components/MealSettings/MealSettings";
-import { FormElementWrapper } from "../components/formElements/FormElementWrapper/FormElementWrapper";
-import { FormWrapper } from "../components/formElements/FormWrapper/FormWrapper";
-import { Input, InputType } from "../components/formElements/Input/Input";
-import { Label } from "../components/formElements/Label/Label";
-import { RandomizedMealsForm } from "../components/RandomizedMealsForm/RandomizedMealsForm";
+import {
+  MealItem,
+  RandomizedMealsForm,
+} from "../components/RandomizedMealsForm/RandomizedMealsForm";
 
 export default async function Page() {
+  const initialMealsCount = 5;
+
+  const generateInitialMeals = (initialMealsCount: number): MealItem[] => {
+    const meals: MealItem[] = new Array(initialMealsCount)
+      .fill("")
+      .map((_, index) => {
+        const mealItemNumber: string = (index + 1).toString();
+        return {
+          itemId: mealItemNumber,
+          tags: ["tag1Id", "tag2Id"],
+          difficulityLevel: "level id",
+        };
+      });
+    return meals;
+  };
+
+  const initialMeals = generateInitialMeals(initialMealsCount);
+
   return (
     <div>
       <MainTitle title="Randomize meals" />
-      <RandomizedMealsForm />
+      <RandomizedMealsForm
+        initialMeals={initialMeals}
+        initialMealsCount={initialMealsCount}
+      />
     </div>
   );
 }
