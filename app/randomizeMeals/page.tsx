@@ -1,13 +1,32 @@
+import { StringMappingType } from "typescript";
 import { MainTitle } from "../components/MainTitle/MainTitle";
 import {
   MealItem,
   RandomizedMealsForm,
 } from "../components/RandomizedMealsForm/RandomizedMealsForm";
 
+export interface DifficultyLevel {
+  _id: string;
+  level: string;
+}
+
 export default async function Page() {
   const initialMealsCount = 5;
 
-  const generateInitialMeals = (initialMealsCount: number): MealItem[] => {
+  const fetchDifficultyLevels = async (): Promise<DifficultyLevel[]> => {
+    const res = await fetch("http://localhost:3000/api/difficultyLevels");
+
+    if (!res.ok) {
+      throw new Error("Failed to fetch difficulty levels");
+    }
+
+    return res.json();
+  };
+
+  const generateInitialMeals = (
+    initialMealsCount: number,
+    defaultLevel: string
+  ): MealItem[] => {
     const meals: MealItem[] = new Array(initialMealsCount)
       .fill("")
       .map((_, index) => {
@@ -15,13 +34,16 @@ export default async function Page() {
         return {
           itemId: mealItemNumber,
           tags: ["tag1Id", "tag2Id"],
-          difficulityLevel: "level id",
+          difficulityLevel: defaultLevel,
         };
       });
     return meals;
   };
 
-  const initialMeals = generateInitialMeals(initialMealsCount);
+  const difficultyLevels = await fetchDifficultyLevels();
+  const defaultLevel =
+    difficultyLevels.find((item) => item.level === "Easy")?._id || "";
+  const initialMeals = generateInitialMeals(initialMealsCount, defaultLevel);
 
   return (
     <div>
@@ -29,6 +51,8 @@ export default async function Page() {
       <RandomizedMealsForm
         initialMeals={initialMeals}
         initialMealsCount={initialMealsCount}
+        difficultyLevels={difficultyLevels}
+        defaultLevel={defaultLevel}
       />
     </div>
   );

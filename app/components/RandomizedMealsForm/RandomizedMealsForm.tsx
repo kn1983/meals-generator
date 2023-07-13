@@ -4,6 +4,7 @@ import { MealSettings } from "../MealSettings/MealSettings";
 import { FormElementWrapper } from "../formElements/FormElementWrapper/FormElementWrapper";
 import { Label } from "../formElements/Label/Label";
 import { Select, SelectListItemProps } from "../formElements/Select/Select";
+import { DifficultyLevel } from "@/app/randomizeMeals/page";
 
 export interface MealItem {
   itemId: string;
@@ -14,36 +15,62 @@ export interface MealItem {
 interface RandomizedMealsFormProps {
   initialMealsCount: number;
   initialMeals: MealItem[];
+  difficultyLevels: DifficultyLevel[];
+  defaultLevel: string;
 }
 
 const RandomizedMealsForm = ({
   initialMealsCount,
   initialMeals,
+  difficultyLevels,
+  defaultLevel,
 }: RandomizedMealsFormProps) => {
-  const [mealItems, setMealItem] = useState<MealItem[]>(initialMeals);
-
+  const [mealItems, setMealItems] = useState<MealItem[]>(initialMeals);
   const daysRef: RefObject<HTMLSelectElement> = useRef(null);
 
-  const increaseMealItems = (newItems: number) => {};
+  const increaseMealItems = (newItemsCount: number) => {
+    const itemsToAdd = newItemsCount - mealItems.length;
+    // let newMealItems = [...mealItems];
 
-  const decreaseMealItems = (newItems: number) => {};
+    const newItems = new Array(itemsToAdd).fill("").reduce(
+      (accumulator, _) => {
+        return [...accumulator, getNewMealItem(accumulator.length)];
+      },
+      [...mealItems]
+    );
+    console.log(newItems);
+    setMealItems(newItems);
+  };
+
+  const decreaseMealItems = (newItemsCount: number) => {
+    const itemsToRemove = mealItems.length - newItemsCount;
+    const newMealItems = [...mealItems];
+    setMealItems(newMealItems.slice(0, itemsToRemove * -1));
+  };
 
   const daysOnChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const items = parseInt(e.target.value) || 0;
-    if (items === mealItems.length) {
+    const newItemsCount = parseInt(e.target.value) || 0;
+    if (newItemsCount === mealItems.length) {
       return;
     }
 
-    if (items > mealItems.length) {
-      increaseMealItems(items);
+    if (newItemsCount > mealItems.length) {
+      increaseMealItems(newItemsCount);
     } else {
-      decreaseMealItems(items);
+      decreaseMealItems(newItemsCount);
     }
-
-    console.log("Change items");
   };
 
-  const renderSelectItems = (): SelectListItemProps[] => {
+  const getNewMealItem = (currentIndex: number): MealItem => {
+    const item = (currentIndex + 1).toString();
+    return {
+      itemId: item,
+      tags: [],
+      difficulityLevel: defaultLevel,
+    };
+  };
+
+  const renderSelectDaysItems = (): SelectListItemProps[] => {
     const maxItems = 20;
     const itemsArray: SelectListItemProps[] = new Array(maxItems)
       .fill("")
@@ -66,7 +93,7 @@ const RandomizedMealsForm = ({
           <Select
             id="days"
             name="days"
-            items={renderSelectItems()}
+            items={renderSelectDaysItems()}
             onChange={daysOnChange}
             reference={daysRef}
             defaultValue={initialMealsCount.toString()}
@@ -74,8 +101,14 @@ const RandomizedMealsForm = ({
         </FormElementWrapper>
       </div>
       <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:justify-between">
-        {mealItems.map((item, index) => {
-          return <MealSettings key={item.itemId} />;
+        {mealItems.map((item) => {
+          return (
+            <MealSettings
+              key={item.itemId}
+              difficultyLevels={difficultyLevels}
+              defaultLevel={defaultLevel}
+            />
+          );
         })}
       </div>
     </>

@@ -12,7 +12,7 @@ const fetchMeals = async (): Promise<Meal[]> => {
   if (!res.ok) {
     throw new Error("Failed to fetch meals");
   }
-  console.log("ITS WORKING");
+
   return res.json();
 };
 
