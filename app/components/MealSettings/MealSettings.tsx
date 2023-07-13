@@ -34,11 +34,13 @@ const tags = [
 interface MealSettingsProps {
   difficultyLevels: DifficultyLevel[];
   defaultLevel: string;
+  mealTitle: string;
 }
 
 const MealSettings = ({
   difficultyLevels,
   defaultLevel,
+  mealTitle,
 }: MealSettingsProps) => {
   const difficultyLevelItems = difficultyLevels.map((item, index) => {
     return {
@@ -50,7 +52,7 @@ const MealSettings = ({
 
   return (
     <div className="bg-gray-900 p-5 rounded-lg">
-      <h2 className="text-2xl mb-2">Meal 1</h2>
+      <h2 className="text-2xl mb-2">{mealTitle}</h2>
       <FormElementWrapper>
         <Label htmlFor="difficultyLevel" labelText="Difficulty level" />
         <Select

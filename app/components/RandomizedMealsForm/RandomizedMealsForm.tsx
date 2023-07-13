@@ -30,15 +30,12 @@ const RandomizedMealsForm = ({
 
   const increaseMealItems = (newItemsCount: number) => {
     const itemsToAdd = newItemsCount - mealItems.length;
-    // let newMealItems = [...mealItems];
-
     const newItems = new Array(itemsToAdd).fill("").reduce(
       (accumulator, _) => {
         return [...accumulator, getNewMealItem(accumulator.length)];
       },
       [...mealItems]
     );
-    console.log(newItems);
     setMealItems(newItems);
   };
 
@@ -101,12 +98,13 @@ const RandomizedMealsForm = ({
         </FormElementWrapper>
       </div>
       <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:justify-between">
-        {mealItems.map((item) => {
+        {mealItems.map((item, index) => {
           return (
             <MealSettings
               key={item.itemId}
               difficultyLevels={difficultyLevels}
               defaultLevel={defaultLevel}
+              mealTitle={`Meal ${index + 1}`}
             />
           );
         })}

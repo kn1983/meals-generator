@@ -33,7 +33,7 @@ export default async function Page() {
         const mealItemNumber: string = (index + 1).toString();
         return {
           itemId: mealItemNumber,
-          tags: ["tag1Id", "tag2Id"],
+          tags: [],
           difficulityLevel: defaultLevel,
         };
       });
