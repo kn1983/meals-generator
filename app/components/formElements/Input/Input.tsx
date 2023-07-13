@@ -38,6 +38,7 @@ const Input = ({
       defaultValue={defaultValue}
       onKeyDown={onKeyDown}
       onChange={onChange}
+      autoComplete="off"
     />
   );
 };

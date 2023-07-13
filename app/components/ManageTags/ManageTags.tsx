@@ -57,8 +57,10 @@ const ManageTags = ({
     if (inputValue === "") {
       return setMatchingTags([]);
     }
-    const matchingTags = allTags.filter((tag) =>
-      tag.tagName.toLowerCase().includes(inputValue.toLowerCase())
+    const matchingTags = allTags.filter(
+      (tag) =>
+        tag.tagName.toLowerCase().includes(inputValue.toLowerCase()) &&
+        !itemTags.find((itemTag) => itemTag === tag._id)
     );
     setMatchingTags(matchingTags);
   };
