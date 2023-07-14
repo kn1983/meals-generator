@@ -2,18 +2,33 @@ import { Tag } from "@/app/randomizeMeals/page";
 import { Input, InputType } from "../formElements/Input/Input";
 import { Label } from "../formElements/Label/Label";
 import React, { RefObject, useRef, useState } from "react";
-import { AddTagToMealItemArgs } from "../RandomizedMealsForm/RandomizedMealsForm";
+import {
+  AddTagToMealItemArgs,
+  RemoveTagFromMealItemArgs,
+} from "../RandomizedMealsForm/RandomizedMealsForm";
 
 const tagWrapperStyles =
   "mr-2 mb-2 flex text-xs rounded tracking-wide leading-none";
 
-const TagItem = ({ tag }: { tag: Tag }) => {
+const TagItem = ({
+  tag,
+  removeTagFromMealItem,
+  mealId,
+}: {
+  tag: Tag;
+  mealId: string;
+  removeTagFromMealItem: (args: RemoveTagFromMealItemArgs) => void;
+}) => {
+  const removeOnClick = () => {
+    removeTagFromMealItem({ tagId: tag._id, mealId });
+  };
   return (
     <span className={`${tagWrapperStyles} pr-0 bg-slate-300 flex`}>
       <span className="pl-2 py-2">{tag.tagName}</span>
       <button
         type="button"
         className="relative px-2 block after:content-['x'] after:text-blue-600 after:absolute after:top-2 after:left-1 leading-none text-xs"
+        onClick={removeOnClick}
       >
         <span className="sr-only">Remove tag</span>
       </button>
@@ -43,11 +58,13 @@ const ManageTags = ({
   mealId,
   allTags,
   addTagToMealItem,
+  removeTagFromMealItem,
 }: {
   itemTags: string[];
   allTags: Tag[];
   mealId: string;
   addTagToMealItem: (args: AddTagToMealItemArgs) => void;
+  removeTagFromMealItem: (args: RemoveTagFromMealItemArgs) => void;
 }) => {
   const [matchingTags, setMatchingTags] = useState<Tag[]>([]);
   const tagsInputRef: RefObject<HTMLInputElement> = useRef(null);
@@ -58,13 +75,13 @@ const ManageTags = ({
         !itemTags.find((itemTag) => itemTag === tag._id)
     );
 
-  const addTag = (tagId: string) => {
-    addTagToMealItem({ tagId: tagId, mealId });
-    if (tagsInputRef?.current) {
-      tagsInputRef.current.value = "";
-      setMatchingTags([]);
-    }
-  };
+  // const addTag = (tagId: string) => {
+  //   addTagToMealItem({ tagId: tagId, mealId });
+  //   if (tagsInputRef?.current) {
+  //     tagsInputRef.current.value = "";
+  //     setMatchingTags([]);
+  //   }
+  // };
 
   const addTagByTypeComma = async (inputValue: string) => {
     const tagToAdd = inputValue.split(",")[0];
@@ -134,7 +151,16 @@ const ManageTags = ({
               (tag) => tag._id === tagId
             );
 
-            return tagItem && <TagItem tag={tagItem} key={tagItem._id} />;
+            return (
+              tagItem && (
+                <TagItem
+                  tag={tagItem}
+                  key={tagItem._id}
+                  removeTagFromMealItem={removeTagFromMealItem}
+                  mealId={mealId}
+                />
+              )
+            );
           })}
         </div>
         <Input

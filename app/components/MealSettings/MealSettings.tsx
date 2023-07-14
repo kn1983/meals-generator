@@ -3,7 +3,10 @@ import { ManageTags } from "../ManageTags/ManageTags";
 import { FormElementWrapper } from "../formElements/FormElementWrapper/FormElementWrapper";
 import { Label } from "../formElements/Label/Label";
 import { Select } from "../formElements/Select/Select";
-import { AddTagToMealItemArgs } from "../RandomizedMealsForm/RandomizedMealsForm";
+import {
+  AddTagToMealItemArgs,
+  RemoveTagFromMealItemArgs,
+} from "../RandomizedMealsForm/RandomizedMealsForm";
 
 interface MealSettingsProps {
   difficultyLevels: DifficultyLevel[];
@@ -13,6 +16,7 @@ interface MealSettingsProps {
   itemTags: string[];
   mealId: string;
   addTagToMealItem: (args: AddTagToMealItemArgs) => void;
+  removeTagFromMealItem: (args: RemoveTagFromMealItemArgs) => void;
 }
 
 const MealSettings = ({
@@ -23,6 +27,7 @@ const MealSettings = ({
   itemTags,
   mealId,
   addTagToMealItem,
+  removeTagFromMealItem,
 }: MealSettingsProps) => {
   const difficultyLevelItems = difficultyLevels.map((item, index) => {
     return {
@@ -48,6 +53,7 @@ const MealSettings = ({
         allTags={allTags}
         mealId={mealId}
         addTagToMealItem={addTagToMealItem}
+        removeTagFromMealItem={removeTagFromMealItem}
       />
     </div>
   );

@@ -25,6 +25,11 @@ export interface AddTagToMealItemArgs {
   tagId: string;
 }
 
+export interface RemoveTagFromMealItemArgs {
+  mealId: string;
+  tagId: string;
+}
+
 const RandomizedMealsForm = ({
   initialMealsCount,
   initialMeals,
@@ -107,6 +112,19 @@ const RandomizedMealsForm = ({
     setAllTags(allTags);
   };
 
+  const removeTagFromMealItem = async ({
+    mealId,
+    tagId,
+  }: RemoveTagFromMealItemArgs) => {
+    const mealIndex = mealItems.findIndex((meal) => meal.itemId === mealId);
+    const newMealItems: MealItem[] = [...mealItems];
+    newMealItems[mealIndex].tags.splice(
+      newMealItems[mealIndex].tags.indexOf(tagId),
+      1
+    );
+    setMealItems(newMealItems);
+  };
+
   // const tagOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
   //   const attributeName = event.target.getAttribute("name");
   //   const mealId = attributeName?.split("_")[0] || "";
@@ -120,7 +138,7 @@ const RandomizedMealsForm = ({
 
   return (
     <>
-      <div className="w-1/4">
+      <div className="xs:w-1/2 md:w-1/4">
         <FormElementWrapper>
           <Label htmlFor="days" labelText="How many days" />
           <Select
@@ -144,6 +162,7 @@ const RandomizedMealsForm = ({
               itemTags={item.tags}
               mealId={item.itemId}
               addTagToMealItem={addTagToMealItem}
+              removeTagFromMealItem={removeTagFromMealItem}
             />
           );
         })}
