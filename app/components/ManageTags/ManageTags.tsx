@@ -66,17 +66,34 @@ const ManageTags = ({
     }
   };
 
-  const addTagByTypeComma = (inputValue: string) => {
+  const addTagByTypeComma = async (inputValue: string) => {
     const tagToAdd = inputValue.split(",")[0];
     if (tagToAdd === "") {
       return;
     }
     const matchingTags = checkMatchingTags(tagToAdd.toLocaleLowerCase());
-    if (matchingTags.length === 1) {
+    if (
+      matchingTags.length === 1 &&
+      matchingTags[0].tagName.toLocaleLowerCase() ==
+        tagToAdd.toLocaleLowerCase()
+    ) {
       addTagToMealItem({ tagId: matchingTags[0]._id, mealId });
       resetTagInputAndSuggestions();
     } else {
       console.log("No suggestion or more than one");
+      const response = await fetch("http://localhost:3000/api/addTag", {
+        method: "POST",
+        body: JSON.stringify({ tagName: tagToAdd }),
+        headers: {
+          "content-type": "application/json",
+        },
+      });
+      if (!response.ok) {
+        throw new Error("Failed to post tag");
+      }
+      const jsonResponse: { tagId: string } = await response.json();
+      addTagToMealItem({ tagId: jsonResponse.tagId, mealId });
+      resetTagInputAndSuggestions();
     }
   };
 
