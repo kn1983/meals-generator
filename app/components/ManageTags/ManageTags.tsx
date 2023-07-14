@@ -39,13 +39,19 @@ const TagItem = ({
 const TagSuggestion = ({
   tag,
   tagSuggestionOnClick,
+  isFirst,
 }: {
   tag: Tag;
   tagSuggestionOnClick: (tagId: string) => void;
+  isFirst: boolean;
 }) => {
   return (
     <button
-      className={`${tagWrapperStyles} pr-2 bg-blue-800 hover:bg-blue-900 text-white`}
+      className={`${tagWrapperStyles} ${
+        isFirst
+          ? "bg-blue-500 hover:bg-blue-500"
+          : "bg-blue-800 hover:bg-blue-900"
+      } pr-2 text-white`}
       onClick={() => tagSuggestionOnClick(tag._id)}
     >
       <span className="pl-2 py-2">{tag.tagName}</span>
@@ -75,13 +81,20 @@ const ManageTags = ({
         !itemTags.find((itemTag) => itemTag === tag._id)
     );
 
-  // const addTag = (tagId: string) => {
-  //   addTagToMealItem({ tagId: tagId, mealId });
-  //   if (tagsInputRef?.current) {
-  //     tagsInputRef.current.value = "";
-  //     setMatchingTags([]);
-  //   }
-  // };
+  const saveNewTag = async (tagToAdd: string): Promise<string> => {
+    const response = await fetch("http://localhost:3000/api/addTag", {
+      method: "POST",
+      body: JSON.stringify({ tagName: tagToAdd }),
+      headers: {
+        "content-type": "application/json",
+      },
+    });
+    if (!response.ok) {
+      throw new Error("Failed to post tag");
+    }
+    const jsonResponse: { tagId: string } = await response.json();
+    return jsonResponse.tagId;
+  };
 
   const addTagByTypeComma = async (inputValue: string) => {
     const tagToAdd = inputValue.split(",")[0];
@@ -89,28 +102,32 @@ const ManageTags = ({
       return;
     }
     const matchingTags = checkMatchingTags(tagToAdd.toLocaleLowerCase());
+    resetTagInputAndSuggestions();
     if (
       matchingTags.length === 1 &&
       matchingTags[0].tagName.toLocaleLowerCase() ==
         tagToAdd.toLocaleLowerCase()
     ) {
       addTagToMealItem({ tagId: matchingTags[0]._id, mealId });
-      resetTagInputAndSuggestions();
     } else {
-      console.log("No suggestion or more than one");
-      const response = await fetch("http://localhost:3000/api/addTag", {
-        method: "POST",
-        body: JSON.stringify({ tagName: tagToAdd }),
-        headers: {
-          "content-type": "application/json",
-        },
-      });
-      if (!response.ok) {
-        throw new Error("Failed to post tag");
-      }
-      const jsonResponse: { tagId: string } = await response.json();
-      addTagToMealItem({ tagId: jsonResponse.tagId, mealId });
+      const addedTagId = await saveNewTag(tagToAdd);
+      addTagToMealItem({ tagId: addedTagId, mealId });
+    }
+  };
+
+  const tagsOnKeyDown = async (
+    event: React.KeyboardEvent<HTMLInputElement>
+  ) => {
+    const tagToAdd = tagsInputRef.current?.value;
+    if (event.key === "Enter" && tagToAdd) {
+      const matchingTags = checkMatchingTags(tagToAdd.toLocaleLowerCase());
       resetTagInputAndSuggestions();
+      if (matchingTags.length > 0) {
+        addTagToMealItem({ tagId: matchingTags[0]._id, mealId });
+      } else {
+        const addedTagId = await saveNewTag(tagToAdd);
+        addTagToMealItem({ tagId: addedTagId, mealId });
+      }
     }
   };
 
@@ -169,15 +186,17 @@ const ManageTags = ({
           placeholder="Tags"
           onChange={tagOnChange}
           reference={tagsInputRef}
+          onKeyDown={tagsOnKeyDown}
         />
       </div>
       <div className="text-black flex flex-wrap mb-1">
-        {matchingTags.map((tagSuggestion) => {
+        {matchingTags.map((tagSuggestion, index) => {
           return (
             <TagSuggestion
               tag={tagSuggestion}
               key={tagSuggestion._id}
               tagSuggestionOnClick={tagSuggestionOnClick}
+              isFirst={index === 0}
             />
           );
         })}
