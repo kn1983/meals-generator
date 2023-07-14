@@ -17,7 +17,7 @@ interface RandomizedMealsFormProps {
   initialMeals: MealItem[];
   difficultyLevels: DifficultyLevel[];
   defaultLevel: string;
-  allTags: Tag[];
+  initialTags: Tag[];
 }
 
 export interface AddTagToMealItemArgs {
@@ -30,9 +30,10 @@ const RandomizedMealsForm = ({
   initialMeals,
   difficultyLevels,
   defaultLevel,
-  allTags,
+  initialTags,
 }: RandomizedMealsFormProps) => {
   const [mealItems, setMealItems] = useState<MealItem[]>(initialMeals);
+  const [allTags, setAllTags] = useState<Tag[]>(initialTags);
   const daysRef: RefObject<HTMLSelectElement> = useRef(null);
 
   const increaseMealItems = (newItemsCount: number) => {
@@ -89,11 +90,21 @@ const RandomizedMealsForm = ({
     return itemsArray;
   };
 
-  const addTagToMealItem = ({ mealId, tagId }: AddTagToMealItemArgs) => {
+  const fetchTags = async (): Promise<Tag[]> => {
+    const res = await fetch("http://localhost:3000/api/tags");
+    if (!res.ok) {
+      throw new Error("Failed to fetch tags");
+    }
+    return res.json();
+  };
+
+  const addTagToMealItem = async ({ mealId, tagId }: AddTagToMealItemArgs) => {
     const mealIndex = mealItems.findIndex((meal) => meal.itemId === mealId);
     const newMealItems: MealItem[] = [...mealItems];
     newMealItems[mealIndex].tags.push(tagId);
     setMealItems(newMealItems);
+    const allTags = await fetchTags();
+    setAllTags(allTags);
   };
 
   // const tagOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {

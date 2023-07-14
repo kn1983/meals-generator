@@ -66,7 +66,7 @@ export default async function Page() {
         initialMealsCount={initialMealsCount}
         difficultyLevels={difficultyLevels}
         defaultLevel={defaultLevel}
-        allTags={allTags}
+        initialTags={allTags}
       />
     </div>
   );
