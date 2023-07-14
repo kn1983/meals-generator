@@ -12,6 +12,7 @@ interface SelectProps {
   reference?: RefObject<HTMLSelectElement>;
   defaultValue?: string;
   onChange?: (event: React.ChangeEvent<HTMLSelectElement>) => void;
+  value?: string;
 }
 const Select = ({
   items,
@@ -19,6 +20,7 @@ const Select = ({
   reference,
   defaultValue,
   onChange,
+  value,
 }: SelectProps) => {
   {
     items.length == 0 && null;
@@ -30,6 +32,7 @@ const Select = ({
       ref={reference}
       defaultValue={defaultValue}
       onChange={onChange}
+      value={value}
     >
       {items.map((item) => {
         return (

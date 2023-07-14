@@ -103,8 +103,11 @@ const RandomizedMealsForm = ({
     return res.json();
   };
 
+  const getMealIndexByMealId = (mealId: string): number =>
+    mealItems.findIndex((meal) => meal.itemId === mealId);
+
   const addTagToMealItem = async ({ mealId, tagId }: AddTagToMealItemArgs) => {
-    const mealIndex = mealItems.findIndex((meal) => meal.itemId === mealId);
+    const mealIndex = getMealIndexByMealId(mealId);
     const newMealItems: MealItem[] = [...mealItems];
     newMealItems[mealIndex].tags.push(tagId);
     setMealItems(newMealItems);
@@ -125,16 +128,16 @@ const RandomizedMealsForm = ({
     setMealItems(newMealItems);
   };
 
-  // const tagOnChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-  //   const attributeName = event.target.getAttribute("name");
-  //   const mealId = attributeName?.split("_")[0] || "";
-  //   const mealIndex = mealItems.findIndex((meal) => meal.itemId === mealId);
-  //   const inputValue = event.target.value;
-  //   const matchingTags = allTags.filter((tag) =>
-  //     tag.tagName.toLowerCase().includes(inputValue.toLowerCase())
-  //   );
-  //   console.log(matchingTags);
-  // };
+  const difficultyLevelOnChange = (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    const fieldName = event.target.getAttribute("name");
+    const mealId: string = fieldName?.split("_").pop() || "";
+    const mealIndex = getMealIndexByMealId(mealId);
+    const newMealItems: MealItem[] = [...mealItems];
+    newMealItems[mealIndex].difficulityLevel = event.target.value;
+    setMealItems(newMealItems);
+  };
 
   return (
     <>
@@ -155,14 +158,13 @@ const RandomizedMealsForm = ({
           return (
             <MealSettings
               key={item.itemId}
+              mealItem={item}
               difficultyLevels={difficultyLevels}
-              defaultLevel={defaultLevel}
               mealTitle={`Meal ${index + 1}`}
               allTags={allTags}
-              itemTags={item.tags}
-              mealId={item.itemId}
               addTagToMealItem={addTagToMealItem}
               removeTagFromMealItem={removeTagFromMealItem}
+              difficultyLevelOnChange={difficultyLevelOnChange}
             />
           );
         })}

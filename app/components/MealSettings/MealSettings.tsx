@@ -5,29 +5,31 @@ import { Label } from "../formElements/Label/Label";
 import { Select } from "../formElements/Select/Select";
 import {
   AddTagToMealItemArgs,
+  MealItem,
   RemoveTagFromMealItemArgs,
 } from "../RandomizedMealsForm/RandomizedMealsForm";
+import { Meal } from "@/app/meals/page";
 
 interface MealSettingsProps {
   difficultyLevels: DifficultyLevel[];
-  defaultLevel: string;
   mealTitle: string;
   allTags: Tag[];
-  itemTags: string[];
-  mealId: string;
+  mealItem: MealItem;
   addTagToMealItem: (args: AddTagToMealItemArgs) => void;
   removeTagFromMealItem: (args: RemoveTagFromMealItemArgs) => void;
+  difficultyLevelOnChange: (
+    event: React.ChangeEvent<HTMLSelectElement>
+  ) => void;
 }
 
 const MealSettings = ({
+  mealItem,
   difficultyLevels,
-  defaultLevel,
   mealTitle,
   allTags,
-  itemTags,
-  mealId,
   addTagToMealItem,
   removeTagFromMealItem,
+  difficultyLevelOnChange,
 }: MealSettingsProps) => {
   const difficultyLevelItems = difficultyLevels.map((item, index) => {
     return {
@@ -43,15 +45,15 @@ const MealSettings = ({
       <FormElementWrapper>
         <Label htmlFor="difficultyLevel" labelText="Difficulty level" />
         <Select
-          name="difficultyLevel"
+          name={`difficultyLevel_${mealItem.itemId}`}
           items={difficultyLevelItems}
-          defaultValue={defaultLevel}
+          value={mealItem.difficulityLevel}
+          onChange={difficultyLevelOnChange}
         />
       </FormElementWrapper>
       <ManageTags
-        itemTags={itemTags}
+        mealItem={mealItem}
         allTags={allTags}
-        mealId={mealId}
         addTagToMealItem={addTagToMealItem}
         removeTagFromMealItem={removeTagFromMealItem}
       />
