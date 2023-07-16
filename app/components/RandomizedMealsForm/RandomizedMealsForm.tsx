@@ -140,8 +140,33 @@ const RandomizedMealsForm = ({
     setMealItems(newMealItems);
   };
 
-  const handleSubmitMealsForm = (e: React.MouseEvent<HTMLElement>) => {
+  const handleSubmitMealsForm = async (e: React.MouseEvent<HTMLElement>) => {
     e.preventDefault();
+
+    try {
+      const response = await fetch(
+        "http://localhost:3000/api/mealsBySettings",
+        {
+          method: "POST",
+          body: JSON.stringify({
+            mealItems,
+            mealsCount: daysRef.current?.value || "",
+          }),
+          headers: {
+            "content-type": "application/json",
+          },
+        }
+      );
+
+      if (response.status === 200) {
+        console.log("Cool");
+        // mealRef.current.value = "";
+        // authorRef.current.value = "";
+        // difficultyLevelRef.current.value = "";
+      }
+    } catch (error) {
+      console.log(error);
+    }
 
     console.log(mealItems);
   };
