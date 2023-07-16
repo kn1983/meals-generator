@@ -13,7 +13,7 @@ import { ManageTags } from "../ManageTags/ManageTags";
 
 interface AddMealsFormProps {
   users: User[];
-  initialTags: [];
+  initialTags: Tag[];
   difficultyLevels: DifficultyLevel[];
 }
 
