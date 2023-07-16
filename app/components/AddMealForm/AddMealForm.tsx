@@ -1,24 +1,32 @@
 "use client";
 
 import { User } from "@/app/addMeal/page";
-import { FormEvent, RefObject, useRef } from "react";
+import { FormEvent, RefObject, useRef, useState } from "react";
 import { Label } from "../formElements/Label/Label";
 import { Input, InputType } from "../formElements/Input/Input";
 import { Select, SelectListItemProps } from "../formElements/Select/Select";
 import { PrimaryButton } from "../buttons/PrimaryButton/PrimaryButton";
 import { FormElementWrapper } from "../formElements/FormElementWrapper/FormElementWrapper";
 import { FormWrapper } from "../formElements/FormWrapper/FormWrapper";
-import { DifficultyLevel } from "@/app/randomizeMeals/page";
+import { DifficultyLevel, Tag } from "@/app/randomizeMeals/page";
+import { ManageTags } from "../ManageTags/ManageTags";
 
 interface AddMealsFormProps {
   users: User[];
+  initialTags: [];
   difficultyLevels: DifficultyLevel[];
 }
 
-const AddMealsForm = ({ users, difficultyLevels }: AddMealsFormProps) => {
+const AddMealsForm = ({
+  users,
+  initialTags,
+  difficultyLevels,
+}: AddMealsFormProps) => {
   const mealRef: RefObject<HTMLInputElement> = useRef(null);
   const authorRef: RefObject<HTMLSelectElement> = useRef(null);
   const difficultyLevelRef: RefObject<HTMLSelectElement> = useRef(null);
+  const [currentMealTags, setCurrentMealTags] = useState<string[]>([]);
+  const [allTags, setAllTags] = useState<Tag[]>(initialTags);
 
   const handleSubmitMeal = async (e: FormEvent) => {
     e.preventDefault();
@@ -90,6 +98,26 @@ const AddMealsForm = ({ users, difficultyLevels }: AddMealsFormProps) => {
     ];
   };
 
+  const fetchTags = async (): Promise<Tag[]> => {
+    const res = await fetch("http://localhost:3000/api/tags");
+    if (!res.ok) {
+      throw new Error("Failed to fetch tags");
+    }
+    return res.json();
+  };
+
+  const handleRemoveTag = (tagId: string) => {
+    const newTags = [...currentMealTags];
+    newTags.splice(newTags.indexOf(tagId), 1);
+    setCurrentMealTags(newTags);
+  };
+
+  const handleAddTag = async (tagId: string) => {
+    setCurrentMealTags([...currentMealTags, tagId]);
+    const allTags = await fetchTags();
+    setAllTags(allTags);
+  };
+
   return (
     <div className="flex">
       <FormWrapper>
@@ -122,6 +150,14 @@ const AddMealsForm = ({ users, difficultyLevels }: AddMealsFormProps) => {
                 reference={difficultyLevelRef}
               />
             )}
+          </FormElementWrapper>
+          <FormElementWrapper>
+            <ManageTags
+              allTags={allTags}
+              currentTags={currentMealTags}
+              addTag={handleAddTag}
+              removeTag={handleRemoveTag}
+            />
           </FormElementWrapper>
           <PrimaryButton type="submit" text="Add meal" />
         </form>

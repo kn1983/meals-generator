@@ -8,7 +8,6 @@ import {
   MealItem,
   RemoveTagFromMealItemArgs,
 } from "../RandomizedMealsForm/RandomizedMealsForm";
-import { Meal } from "@/app/meals/page";
 
 interface MealSettingsProps {
   difficultyLevels: DifficultyLevel[];
@@ -39,6 +38,14 @@ const MealSettings = ({
     };
   });
 
+  const addTag = (tagId: string) => {
+    addTagToMealItem({ tagId, mealId: mealItem.itemId });
+  };
+
+  const removeTag = (tagId: string) => {
+    removeTagFromMealItem({ tagId: tagId, mealId: mealItem.itemId });
+  };
+
   return (
     <div className="bg-gray-900 p-5 rounded-lg">
       <h2 className="text-2xl mb-2">{mealTitle}</h2>
@@ -52,10 +59,10 @@ const MealSettings = ({
         />
       </FormElementWrapper>
       <ManageTags
-        mealItem={mealItem}
+        currentTags={mealItem.tags}
         allTags={allTags}
-        addTagToMealItem={addTagToMealItem}
-        removeTagFromMealItem={removeTagFromMealItem}
+        addTag={addTag}
+        removeTag={removeTag}
       />
     </div>
   );

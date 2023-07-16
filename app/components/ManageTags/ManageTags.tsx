@@ -2,26 +2,19 @@ import { Tag } from "@/app/randomizeMeals/page";
 import { Input, InputType } from "../formElements/Input/Input";
 import { Label } from "../formElements/Label/Label";
 import React, { RefObject, useRef, useState } from "react";
-import {
-  AddTagToMealItemArgs,
-  MealItem,
-  RemoveTagFromMealItemArgs,
-} from "../RandomizedMealsForm/RandomizedMealsForm";
 
 const tagWrapperStyles =
   "mr-2 mb-2 flex text-xs rounded tracking-wide leading-none";
 
 const TagItem = ({
   tag,
-  removeTagFromMealItem,
-  mealId,
+  removeTag,
 }: {
   tag: Tag;
-  mealId: string;
-  removeTagFromMealItem: (args: RemoveTagFromMealItemArgs) => void;
+  removeTag: (tagId: string) => void;
 }) => {
   const removeOnClick = () => {
-    removeTagFromMealItem({ tagId: tag._id, mealId });
+    removeTag(tag._id);
   };
   return (
     <span className={`${tagWrapperStyles} pr-0 bg-slate-300 flex`}>
@@ -61,15 +54,15 @@ const TagSuggestion = ({
 };
 
 const ManageTags = ({
-  mealItem,
+  currentTags,
   allTags,
-  addTagToMealItem,
-  removeTagFromMealItem,
+  addTag,
+  removeTag,
 }: {
-  mealItem: MealItem;
+  currentTags: string[];
   allTags: Tag[];
-  addTagToMealItem: (args: AddTagToMealItemArgs) => void;
-  removeTagFromMealItem: (args: RemoveTagFromMealItemArgs) => void;
+  addTag: (tagId: string) => void;
+  removeTag: (tagId: string) => void;
 }) => {
   const [matchingTags, setMatchingTags] = useState<Tag[]>([]);
   const tagsInputRef: RefObject<HTMLInputElement> = useRef(null);
@@ -77,7 +70,7 @@ const ManageTags = ({
     allTags.filter(
       (tag) =>
         tag.tagName.toLowerCase().includes(tagString.toLowerCase()) &&
-        !mealItem.tags.find((itemTag) => itemTag === tag._id)
+        !currentTags.find((itemTag) => itemTag === tag._id)
     );
 
   const saveNewTag = async (tagToAdd: string): Promise<string> => {
@@ -107,10 +100,10 @@ const ManageTags = ({
       matchingTags[0].tagName.toLocaleLowerCase() ==
         tagToAdd.toLocaleLowerCase()
     ) {
-      addTagToMealItem({ tagId: matchingTags[0]._id, mealId: mealItem.itemId });
+      addTag(matchingTags[0]._id);
     } else {
       const addedTagId = await saveNewTag(tagToAdd);
-      addTagToMealItem({ tagId: addedTagId, mealId: mealItem.itemId });
+      addTag(addedTagId);
     }
   };
 
@@ -122,13 +115,10 @@ const ManageTags = ({
       const matchingTags = checkMatchingTags(tagToAdd.toLocaleLowerCase());
       resetTagInputAndSuggestions();
       if (matchingTags.length > 0) {
-        addTagToMealItem({
-          tagId: matchingTags[0]._id,
-          mealId: mealItem.itemId,
-        });
+        addTag(matchingTags[0]._id);
       } else {
         const addedTagId = await saveNewTag(tagToAdd);
-        addTagToMealItem({ tagId: addedTagId, mealId: mealItem.itemId });
+        addTag(addedTagId);
       }
     }
   };
@@ -156,7 +146,7 @@ const ManageTags = ({
   };
 
   const tagSuggestionOnClick = (tagId: string) => {
-    addTagToMealItem({ tagId: tagId, mealId: mealItem.itemId });
+    addTag(tagId);
     resetTagInputAndSuggestions();
   };
 
@@ -165,7 +155,7 @@ const ManageTags = ({
       <div className="mb-3">
         <Label htmlFor="tags" labelText="Tags" />
         <div className="text-black flex flex-wrap mb-1">
-          {mealItem.tags.map((tagId) => {
+          {currentTags.map((tagId) => {
             const tagItem: Tag | undefined = allTags.find(
               (tag) => tag._id === tagId
             );
@@ -175,8 +165,7 @@ const ManageTags = ({
                 <TagItem
                   tag={tagItem}
                   key={tagItem._id}
-                  removeTagFromMealItem={removeTagFromMealItem}
-                  mealId={mealItem.itemId}
+                  removeTag={removeTag}
                 />
               )
             );
