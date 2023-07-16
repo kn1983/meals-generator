@@ -167,8 +167,6 @@ const RandomizedMealsForm = ({
     } catch (error) {
       console.log(error);
     }
-
-    console.log(mealItems);
   };
 
   return (

@@ -27,11 +27,22 @@ export async function POST(request: Request) {
           $unwind: "$user", // Deconstruct user array
         },
         {
+          $lookup: {
+            from: "difficultyLevels",
+            localField: "difficultyLevel",
+            foreignField: "_id",
+            as: "difficultyLevel",
+          },
+        },
+        {
+          $unwind: "$difficultyLevel",
+        },
+        {
           $project: {
-            // Choose fields to include
             _id: 1,
             title: 1,
             authorName: "$user.userName",
+            difficultyLevel: "$difficultyLevel.level",
           },
         },
         {
