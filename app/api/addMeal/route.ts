@@ -9,13 +9,15 @@ export async function POST(request: Request) {
     const client: MongoClient = await clientPromise;
     const db = client.db("mealsGenerator");
     const body = await request.json();
-    const { meal, author } = body;
+    const { meal, author, difficulityLevel } = body;
 
     const authorId = new ObjectId(author);
+    const difficulityLevelId = new ObjectId(difficulityLevel);
 
     await db.collection("meals").insertOne({
       author: authorId,
       title: meal,
+      difficultyLevel: difficulityLevelId,
     });
     data = {};
   } catch (e) {

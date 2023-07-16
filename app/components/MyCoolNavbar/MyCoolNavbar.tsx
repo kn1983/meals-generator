@@ -15,8 +15,8 @@ const MyCoolNavbarLink = ({
       href={href}
       className={`block text-center px-8 py-2 ${
         currentPage === href
-          ? "bg-blue-500 hover:bg-blue-500"
-          : "bg-blue-800 hover:bg-blue-900"
+          ? "bg-pink-800 hover:bg-pink-800"
+          : "bg-pink-600 hover:bg-pink-500"
       }`}
     >
       {children}

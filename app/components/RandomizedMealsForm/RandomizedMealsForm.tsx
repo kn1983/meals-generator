@@ -1,10 +1,11 @@
 "use client";
-import { RefObject, useRef, useState } from "react";
+import React, { MouseEventHandler, RefObject, useRef, useState } from "react";
 import { MealSettings } from "../MealSettings/MealSettings";
 import { FormElementWrapper } from "../formElements/FormElementWrapper/FormElementWrapper";
 import { Label } from "../formElements/Label/Label";
 import { Select, SelectListItemProps } from "../formElements/Select/Select";
 import { DifficultyLevel, Tag } from "@/app/randomizeMeals/page";
+import { PrimaryButton } from "../buttons/PrimaryButton/PrimaryButton";
 
 export interface MealItem {
   itemId: string;
@@ -139,19 +140,36 @@ const RandomizedMealsForm = ({
     setMealItems(newMealItems);
   };
 
+  const handleSubmitMealsForm = (e: React.MouseEvent<HTMLElement>) => {
+    e.preventDefault();
+
+    console.log(mealItems);
+  };
+
   return (
     <>
-      <div className="xs:w-1/2 md:w-1/4">
-        <FormElementWrapper>
-          <Label htmlFor="days" labelText="How many days" />
-          <Select
-            name="days"
-            items={renderSelectDaysItems()}
-            onChange={daysOnChange}
-            reference={daysRef}
-            defaultValue={initialMealsCount.toString()}
-          />
-        </FormElementWrapper>
+      <div className="flex items-end flex-wrap">
+        <div className="w-full sm:w-1/2">
+          <FormElementWrapper>
+            <Label htmlFor="days" labelText="How many days" />
+            <Select
+              name="days"
+              items={renderSelectDaysItems()}
+              onChange={daysOnChange}
+              reference={daysRef}
+              defaultValue={initialMealsCount.toString()}
+            />
+          </FormElementWrapper>
+        </div>
+        <div className="w-full sm:w-1/2">
+          <FormElementWrapper>
+            <PrimaryButton
+              type="button"
+              text="Generate meals"
+              buttonOnClick={handleSubmitMealsForm}
+            />
+          </FormElementWrapper>
+        </div>
       </div>
       <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:justify-between">
         {mealItems.map((item, index) => {
