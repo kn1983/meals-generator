@@ -39,29 +39,41 @@ export async function POST(request: Request) {
         },
         {
           $lookup: {
-            from: "tags", // other collection to join with
-            localField: "tags", // name of the posts collection field
-            foreignField: "_id", // name of the tags collection field
-            as: "tagsDetails", // output array field
+            from: "tags", // Specify the collection to join
+            localField: "tags", // Field from the meals collection
+            foreignField: "_id", // Field from the tags collection
+            as: "tagsData", // Output array field
           },
         },
         {
-          $project: {
-            _id: 1,
-            title: 1,
-            authorName: "$user.userName",
-            difficultyLevel: "$difficultyLevel.level",
+          $unwind: "$tagsData", // Deconstruct tagsData array
+          //preserveNullAndEmptyArrays: true, // Include meals with no tags
+        },
+        {
+          $group: {
+            _id: "$_id",
+            title: { $first: "$title" },
+            authorName: { $first: "$user.userName" },
+            difficultyLevel: { $first: "$difficultyLevel.level" },
+            tags: { $push: "$tagsData" },
           },
         },
         {
           $sample: { size: Number(mealsCount) },
         },
+        // {
+        //   $project: {
+        //     // Choose fields to include
+        //     _id: 1,
+        //     title: 1,
+        //     authorName: "$user.userName",
+        //   },
+        // },
       ])
       .toArray();
   } catch (e) {
     data = {
       error: "Error",
-      apa: request,
     };
   }
   return NextResponse.json(data);
