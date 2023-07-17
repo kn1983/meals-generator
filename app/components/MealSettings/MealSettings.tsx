@@ -8,6 +8,7 @@ import {
   MealItem,
   RemoveTagFromMealItemArgs,
 } from "../RandomizedMealsForm/RandomizedMealsForm";
+import { RefObject, useRef } from "react";
 
 interface MealSettingsProps {
   difficultyLevels: DifficultyLevel[];
@@ -30,6 +31,7 @@ const MealSettings = ({
   removeTagFromMealItem,
   difficultyLevelOnChange,
 }: MealSettingsProps) => {
+  const tagsInputRef: RefObject<HTMLInputElement> = useRef(null);
   const difficultyLevelItems = difficultyLevels.map((item, index) => {
     return {
       key: item._id,
@@ -63,6 +65,7 @@ const MealSettings = ({
         allTags={allTags}
         addTag={addTag}
         removeTag={removeTag}
+        tagsInputRef={tagsInputRef}
       />
     </div>
   );

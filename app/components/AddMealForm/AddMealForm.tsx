@@ -35,17 +35,23 @@ const AddMealsForm = ({
     const author = authorRef.current?.value;
     const difficulityLevel = difficultyLevelRef.current?.value;
 
-    if (meal && author && difficulityLevel) {
+    if (meal && author && difficulityLevel && currentMealTags.length > 0) {
       try {
         const response = await fetch("http://localhost:3000/api/addMeal", {
           method: "POST",
-          body: JSON.stringify({ author, meal, difficulityLevel }),
+          body: JSON.stringify({
+            author,
+            meal,
+            difficulityLevel,
+            tags: currentMealTags,
+          }),
           headers: {
             "content-type": "application/json",
           },
         });
 
         if (response.status === 200) {
+          console.log("SUCCESS");
           mealRef.current.value = "";
           authorRef.current.value = "";
           difficultyLevelRef.current.value = "";
@@ -118,6 +124,8 @@ const AddMealsForm = ({
     setAllTags(allTags);
   };
 
+  const tagsInputRef: RefObject<HTMLInputElement> = useRef(null);
+
   return (
     <div className="flex">
       <FormWrapper>
@@ -157,6 +165,7 @@ const AddMealsForm = ({
               currentTags={currentMealTags}
               addTag={handleAddTag}
               removeTag={handleRemoveTag}
+              tagsInputRef={tagsInputRef}
             />
           </FormElementWrapper>
           <PrimaryButton type="submit" text="Add meal" />

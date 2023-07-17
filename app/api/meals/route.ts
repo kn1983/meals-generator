@@ -23,13 +23,45 @@ export async function GET(request: Request) {
           $unwind: "$user", // Deconstruct user array
         },
         {
-          $project: {
-            // Choose fields to include
-            _id: 1,
-            title: 1,
-            authorName: "$user.userName",
+          $lookup: {
+            from: "difficultyLevels",
+            localField: "difficultyLevel",
+            foreignField: "_id",
+            as: "difficultyLevel",
           },
         },
+        {
+          $unwind: "$difficultyLevel",
+        },
+        {
+          $lookup: {
+            from: "tags", // Specify the collection to join
+            localField: "tags", // Field from the meals collection
+            foreignField: "_id", // Field from the tags collection
+            as: "tagsData", // Output array field
+          },
+        },
+        {
+          $unwind: "$tagsData", // Deconstruct tagsData array
+          //preserveNullAndEmptyArrays: true, // Include meals with no tags
+        },
+        {
+          $group: {
+            _id: "$_id",
+            title: { $first: "$title" },
+            authorName: { $first: "$user.userName" },
+            difficultyLevel: { $first: "$difficultyLevel.level" },
+            tags: { $push: "$tagsData" },
+          },
+        },
+        // {
+        //   $project: {
+        //     // Choose fields to include
+        //     _id: 1,
+        //     title: 1,
+        //     authorName: "$user.userName",
+        //   },
+        // },
       ])
       .toArray();
   } catch (e) {

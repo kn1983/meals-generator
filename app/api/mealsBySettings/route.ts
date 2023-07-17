@@ -38,6 +38,14 @@ export async function POST(request: Request) {
           $unwind: "$difficultyLevel",
         },
         {
+          $lookup: {
+            from: "tags", // other collection to join with
+            localField: "tags", // name of the posts collection field
+            foreignField: "_id", // name of the tags collection field
+            as: "tagsDetails", // output array field
+          },
+        },
+        {
           $project: {
             _id: 1,
             title: 1,

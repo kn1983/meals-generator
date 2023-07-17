@@ -8,16 +8,26 @@ export async function POST(request: Request) {
   try {
     const client: MongoClient = await clientPromise;
     const db = client.db("mealsGenerator");
-    const body = await request.json();
-    const { meal, author, difficulityLevel } = body;
+    const body: {
+      meal: string;
+      author: string;
+      difficulityLevel: string;
+      tags: string[];
+    } = await request.json();
+    const { meal, author, difficulityLevel, tags } = body;
 
     const authorId = new ObjectId(author);
     const difficulityLevelId = new ObjectId(difficulityLevel);
+
+    const tagsAsObjectId = tags.map((tag) => {
+      return new ObjectId(tag);
+    });
 
     await db.collection("meals").insertOne({
       author: authorId,
       title: meal,
       difficultyLevel: difficulityLevelId,
+      tags: tagsAsObjectId,
     });
     data = {};
   } catch (e) {

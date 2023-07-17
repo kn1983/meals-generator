@@ -58,14 +58,15 @@ const ManageTags = ({
   allTags,
   addTag,
   removeTag,
+  tagsInputRef,
 }: {
   currentTags: string[];
   allTags: Tag[];
   addTag: (tagId: string) => void;
   removeTag: (tagId: string) => void;
+  tagsInputRef: RefObject<HTMLInputElement>;
 }) => {
   const [matchingTags, setMatchingTags] = useState<Tag[]>([]);
-  const tagsInputRef: RefObject<HTMLInputElement> = useRef(null);
   const checkMatchingTags = (tagString: string): Tag[] =>
     allTags.filter(
       (tag) =>
