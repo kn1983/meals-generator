@@ -6,6 +6,8 @@ import { Label } from "../formElements/Label/Label";
 import { Select, SelectListItemProps } from "../formElements/Select/Select";
 import { DifficultyLevel, Tag } from "@/app/randomizeMeals/page";
 import { PrimaryButton } from "../buttons/PrimaryButton/PrimaryButton";
+import { MealsSuggestions } from "../MealsSuggestions/MealsSuggestions";
+import { MealItemsToKeep } from "../MealItemsToKeep/MealsToKeep";
 
 export interface MealItem {
   itemId: string;
@@ -31,6 +33,14 @@ export interface RemoveTagFromMealItemArgs {
   tagId: string;
 }
 
+export interface RandomizedMealItem {
+  _id: string;
+  difficultyLevel: string;
+  tags: Tag[];
+  title: string;
+  authorName: string;
+}
+
 const RandomizedMealsForm = ({
   initialMealsCount,
   initialMeals,
@@ -40,6 +50,10 @@ const RandomizedMealsForm = ({
 }: RandomizedMealsFormProps) => {
   const [mealItems, setMealItems] = useState<MealItem[]>(initialMeals);
   const [allTags, setAllTags] = useState<Tag[]>(initialTags);
+  const [mealsSuggestions, setMealsSuggestions] = useState<
+    RandomizedMealItem[]
+  >([]);
+  const [mealsToKeep, setMealsToKeep] = useState<RandomizedMealItem[]>([]);
   const daysRef: RefObject<HTMLSelectElement> = useRef(null);
 
   const increaseMealItems = (newItemsCount: number) => {
@@ -159,7 +173,12 @@ const RandomizedMealsForm = ({
       );
 
       if (response.status === 200) {
-        console.log("Cool");
+        if (!response.ok) {
+          throw new Error("Hej apa");
+        }
+        const fetchedRandomizedMealItems: RandomizedMealItem[] =
+          await response.json();
+        setMealsSuggestions(fetchedRandomizedMealItems);
         // mealRef.current.value = "";
         // authorRef.current.value = "";
         // difficultyLevelRef.current.value = "";
@@ -169,48 +188,71 @@ const RandomizedMealsForm = ({
     }
   };
 
-  return (
-    <>
-      <div className="flex items-end flex-wrap">
-        <div className="w-full sm:w-1/2">
-          <FormElementWrapper>
-            <Label htmlFor="days" labelText="How many days" />
-            <Select
-              name="days"
-              items={renderSelectDaysItems()}
-              onChange={daysOnChange}
-              reference={daysRef}
-              defaultValue={initialMealsCount.toString()}
-            />
-          </FormElementWrapper>
+  const handleKeepMeal = (meal: RandomizedMealItem): void => {
+    const newMealSuggestions = mealsSuggestions.filter(
+      (item) => item._id !== meal._id
+    );
+    setMealsToKeep([...mealsToKeep, meal]);
+    setMealsSuggestions(newMealSuggestions);
+  };
+  if (mealsSuggestions.length > 0 || mealsToKeep.length > 0) {
+    return (
+      <>
+        {mealsSuggestions.length > 0 && (
+          <MealsSuggestions
+            mealItems={mealsSuggestions}
+            handleKeepMeal={handleKeepMeal}
+          />
+        )}
+        {mealsToKeep.length > 0 && (
+          <MealItemsToKeep mealsToKeep={mealsToKeep} />
+        )}
+      </>
+    );
+  } else {
+    return (
+      <>
+        <div className="flex items-end flex-wrap">
+          <div className="grow">
+            <FormElementWrapper>
+              <Label htmlFor="days" labelText="How many days" />
+              <Select
+                name="days"
+                items={renderSelectDaysItems()}
+                onChange={daysOnChange}
+                reference={daysRef}
+                defaultValue={initialMealsCount.toString()}
+              />
+            </FormElementWrapper>
+          </div>
+          <div className="">
+            <FormElementWrapper>
+              <PrimaryButton
+                type="button"
+                text="Generate meals"
+                buttonOnClick={handleSubmitMealsForm}
+              />
+            </FormElementWrapper>
+          </div>
         </div>
-        <div className="w-full sm:w-1/2">
-          <FormElementWrapper>
-            <PrimaryButton
-              type="button"
-              text="Generate meals"
-              buttonOnClick={handleSubmitMealsForm}
-            />
-          </FormElementWrapper>
+        <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:justify-between">
+          {mealItems.map((item, index) => {
+            return (
+              <MealSettings
+                key={item.itemId}
+                mealItem={item}
+                difficultyLevels={difficultyLevels}
+                mealTitle={`Meal ${index + 1}`}
+                allTags={allTags}
+                addTagToMealItem={addTagToMealItem}
+                removeTagFromMealItem={removeTagFromMealItem}
+                difficultyLevelOnChange={difficultyLevelOnChange}
+              />
+            );
+          })}
         </div>
-      </div>
-      <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:justify-between">
-        {mealItems.map((item, index) => {
-          return (
-            <MealSettings
-              key={item.itemId}
-              mealItem={item}
-              difficultyLevels={difficultyLevels}
-              mealTitle={`Meal ${index + 1}`}
-              allTags={allTags}
-              addTagToMealItem={addTagToMealItem}
-              removeTagFromMealItem={removeTagFromMealItem}
-              difficultyLevelOnChange={difficultyLevelOnChange}
-            />
-          );
-        })}
-      </div>
-    </>
-  );
+      </>
+    );
+  }
 };
 export { RandomizedMealsForm };
