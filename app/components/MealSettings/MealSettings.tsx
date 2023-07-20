@@ -50,9 +50,13 @@ const MealSettings = ({
 
   return (
     <div className="bg-gray-900 p-5 rounded-lg">
-      <h2 className="text-2xl mb-2">{mealTitle}</h2>
+      <h2 className="text-xl mb-2">{mealTitle}</h2>
+
       <FormElementWrapper>
-        <Label htmlFor="difficultyLevel" labelText="Difficulty level" />
+        <Label
+          htmlFor={`difficultyLevel_${mealItem.itemId}`}
+          labelText="Difficulty level"
+        />
         <Select
           name={`difficultyLevel_${mealItem.itemId}`}
           items={difficultyLevelItems}
@@ -66,6 +70,8 @@ const MealSettings = ({
         addTag={addTag}
         removeTag={removeTag}
         tagsInputRef={tagsInputRef}
+        labelText="Tags (optional)"
+        tagFieldId={`tags_${mealItem.itemId}`}
       />
     </div>
   );

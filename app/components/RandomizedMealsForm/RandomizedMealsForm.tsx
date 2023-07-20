@@ -6,13 +6,14 @@ import { Label } from "../formElements/Label/Label";
 import { Select, SelectListItemProps } from "../formElements/Select/Select";
 import { DifficultyLevel, Tag } from "@/app/randomizeMeals/page";
 import { PrimaryButton } from "../buttons/PrimaryButton/PrimaryButton";
-import { MealsSuggestions } from "../MealsSuggestions/MealsSuggestions";
-import { MealItemsToKeep } from "../MealItemsToKeep/MealsToKeep";
+import { generateUniqueId } from "@/app/utils/generateUniqueId/generateUniqueId";
+import { SecondaryButton } from "../buttons/SecondaryButton/SecondaryButton";
 
 export interface MealItem {
   itemId: string;
   tags: string[];
   difficulityLevel: string;
+  mealSuggestion: RandomizedMealItem | null;
 }
 
 interface RandomizedMealsFormProps {
@@ -50,17 +51,13 @@ const RandomizedMealsForm = ({
 }: RandomizedMealsFormProps) => {
   const [mealItems, setMealItems] = useState<MealItem[]>(initialMeals);
   const [allTags, setAllTags] = useState<Tag[]>(initialTags);
-  const [mealsSuggestions, setMealsSuggestions] = useState<
-    RandomizedMealItem[]
-  >([]);
-  const [mealsToKeep, setMealsToKeep] = useState<RandomizedMealItem[]>([]);
   const daysRef: RefObject<HTMLSelectElement> = useRef(null);
 
   const increaseMealItems = (newItemsCount: number) => {
     const itemsToAdd = newItemsCount - mealItems.length;
     const newItems = new Array(itemsToAdd).fill("").reduce(
       (accumulator, _) => {
-        return [...accumulator, getNewMealItem(accumulator.length)];
+        return [...accumulator, getNewMealItem()];
       },
       [...mealItems]
     );
@@ -86,12 +83,12 @@ const RandomizedMealsForm = ({
     }
   };
 
-  const getNewMealItem = (currentIndex: number): MealItem => {
-    const item = (currentIndex + 1).toString();
+  const getNewMealItem = (): MealItem => {
     return {
-      itemId: item,
+      itemId: generateUniqueId(),
       tags: [],
       difficulityLevel: defaultLevel,
+      mealSuggestion: null,
     };
   };
 
@@ -178,81 +175,120 @@ const RandomizedMealsForm = ({
         }
         const fetchedRandomizedMealItems: RandomizedMealItem[] =
           await response.json();
-        setMealsSuggestions(fetchedRandomizedMealItems);
-        // mealRef.current.value = "";
-        // authorRef.current.value = "";
-        // difficultyLevelRef.current.value = "";
+
+        const newMealItems = [...mealItems];
+
+        fetchedRandomizedMealItems.forEach((fetchedMealItem, index) => {
+          newMealItems[index].mealSuggestion = fetchedMealItem;
+        });
+
+        setMealItems(newMealItems);
       }
     } catch (error) {
       console.log(error);
     }
   };
 
-  const handleKeepMeal = (meal: RandomizedMealItem): void => {
-    const newMealSuggestions = mealsSuggestions.filter(
-      (item) => item._id !== meal._id
-    );
-    setMealsToKeep([...mealsToKeep, meal]);
-    setMealsSuggestions(newMealSuggestions);
-  };
-  if (mealsSuggestions.length > 0 || mealsToKeep.length > 0) {
-    return (
-      <>
-        {mealsSuggestions.length > 0 && (
-          <MealsSuggestions
-            mealItems={mealsSuggestions}
-            handleKeepMeal={handleKeepMeal}
-          />
-        )}
-        {mealsToKeep.length > 0 && (
-          <MealItemsToKeep mealsToKeep={mealsToKeep} />
-        )}
-      </>
-    );
-  } else {
-    return (
-      <>
-        <div className="flex items-end flex-wrap">
-          <div className="grow">
-            <FormElementWrapper>
-              <Label htmlFor="days" labelText="How many days" />
-              <Select
-                name="days"
-                items={renderSelectDaysItems()}
-                onChange={daysOnChange}
-                reference={daysRef}
-                defaultValue={initialMealsCount.toString()}
-              />
-            </FormElementWrapper>
-          </div>
-          <div className="">
-            <FormElementWrapper>
-              <PrimaryButton
-                type="button"
-                text="Generate meals"
-                buttonOnClick={handleSubmitMealsForm}
-              />
-            </FormElementWrapper>
-          </div>
+  const handleEditMealSettings = (mealId: string) => {};
+
+  return (
+    <>
+      <div className="flex items-end flex-wrap">
+        <div className="grow">
+          <FormElementWrapper>
+            <Label htmlFor="days" labelText="How many days" />
+            <Select
+              name="days"
+              items={renderSelectDaysItems()}
+              onChange={daysOnChange}
+              reference={daysRef}
+              defaultValue={initialMealsCount.toString()}
+            />
+          </FormElementWrapper>
         </div>
-        <div className="grid sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:justify-between">
-          {mealItems.map((item, index) => {
+        <div className="">
+          <FormElementWrapper>
+            <PrimaryButton
+              type="button"
+              text="Generate meals"
+              buttonOnClick={handleSubmitMealsForm}
+            />
+          </FormElementWrapper>
+        </div>
+      </div>
+      <h2 className="mb-2 text-2xl">Meals</h2>
+      <div className="grid sm:grid-cols-2 xl:grid-cols-3 gap-4 sm:justify-between">
+        {mealItems.map((item, index) => {
+          if (item.mealSuggestion) {
+            return (
+              <div
+                className="bg-gray-900 border-2 border-pink-500 p-5 rounded-lg"
+                key={item.itemId}
+              >
+                <h2 className="text-xl mb-2 text-pink-500">
+                  {item.mealSuggestion?.title}
+                </h2>
+                <div className="mb-2 text-xs">
+                  <span className="font-bold">Difficulty level:</span>{" "}
+                  <span className="italic">
+                    {item.mealSuggestion.difficultyLevel}
+                  </span>
+                </div>
+                {item.mealSuggestion.tags.length > 0 && (
+                  <div className="flex text-xs ">
+                    <div className="mb-2 font-bold">Taggar:&nbsp;</div>
+                    <ul className="flex gap-x-2 flex-wrap">
+                      {item.mealSuggestion.tags.map((tag) => {
+                        return (
+                          <li key={tag._id} className="italic">
+                            {tag.tagName}
+                          </li>
+                        );
+                      })}
+                    </ul>
+                  </div>
+                )}
+                <div className="text-xs mb-2">
+                  <span className="font-bold">Author:</span>{" "}
+                  <span className="italic">
+                    {item.mealSuggestion.authorName}
+                  </span>
+                </div>
+                <div className="lg:flex lg:gap-x-3 lg:flex-row-reverse">
+                  <div className="order-2">
+                    <SecondaryButton
+                      type="button"
+                      text="Edit settings"
+                      isSmall={true}
+                    />
+                  </div>
+                  <div className="lg:order-1">
+                    <PrimaryButton
+                      type="button"
+                      text="Regenerate"
+                      isSmall={true}
+                    />
+                  </div>
+                </div>
+              </div>
+            );
+          } else {
             return (
               <MealSettings
                 key={item.itemId}
                 mealItem={item}
                 difficultyLevels={difficultyLevels}
-                mealTitle={`Meal ${index + 1}`}
+                mealTitle={`Meal ${index + 1}, Settings`}
                 allTags={allTags}
                 addTagToMealItem={addTagToMealItem}
                 removeTagFromMealItem={removeTagFromMealItem}
                 difficultyLevelOnChange={difficultyLevelOnChange}
               />
             );
-          })}
-        </div>
-      </>
-    );
-  }
+          }
+        })}
+      </div>
+    </>
+  );
 };
 export { RandomizedMealsForm };

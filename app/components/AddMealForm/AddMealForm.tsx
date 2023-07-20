@@ -166,6 +166,8 @@ const AddMealsForm = ({
               addTag={handleAddTag}
               removeTag={handleRemoveTag}
               tagsInputRef={tagsInputRef}
+              tagFieldId="tags"
+              labelText="Tags"
             />
           </FormElementWrapper>
           <PrimaryButton type="submit" text="Add meal" />

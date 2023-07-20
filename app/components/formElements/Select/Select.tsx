@@ -29,6 +29,7 @@ const Select = ({
     <select
       name={name}
       className="bg-pink-600 block p-2 leading-none rounded"
+      id={name}
       ref={reference}
       defaultValue={defaultValue}
       onChange={onChange}

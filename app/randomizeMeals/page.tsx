@@ -3,6 +3,7 @@ import {
   MealItem,
   RandomizedMealsForm,
 } from "../components/RandomizedMealsForm/RandomizedMealsForm";
+import { generateUniqueId } from "../utils/generateUniqueId/generateUniqueId";
 
 export interface DifficultyLevel {
   _id: string;
@@ -39,16 +40,14 @@ export default async function Page() {
     initialMealsCount: number,
     defaultLevel: string
   ): MealItem[] => {
-    const meals: MealItem[] = new Array(initialMealsCount)
-      .fill("")
-      .map((_, index) => {
-        const mealItemNumber: string = (index + 1).toString();
-        return {
-          itemId: mealItemNumber,
-          tags: [],
-          difficulityLevel: defaultLevel,
-        };
-      });
+    const meals: MealItem[] = new Array(initialMealsCount).fill("").map((_) => {
+      return {
+        itemId: generateUniqueId(),
+        tags: [],
+        difficulityLevel: defaultLevel,
+        mealSuggestion: null,
+      };
+    });
     return meals;
   };
 

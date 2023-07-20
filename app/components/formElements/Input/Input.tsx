@@ -31,6 +31,7 @@ const Input = ({
     <input
       type={type}
       name={name}
+      id={name}
       className="block w-full p-2 text-black leading-none border-1 rounded"
       ref={reference}
       placeholder={placeholder}

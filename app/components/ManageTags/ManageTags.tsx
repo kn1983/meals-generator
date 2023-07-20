@@ -59,12 +59,16 @@ const ManageTags = ({
   addTag,
   removeTag,
   tagsInputRef,
+  labelText,
+  tagFieldId,
 }: {
   currentTags: string[];
   allTags: Tag[];
   addTag: (tagId: string) => void;
   removeTag: (tagId: string) => void;
   tagsInputRef: RefObject<HTMLInputElement>;
+  labelText: string;
+  tagFieldId: string;
 }) => {
   const [matchingTags, setMatchingTags] = useState<Tag[]>([]);
   const checkMatchingTags = (tagString: string): Tag[] =>
@@ -154,7 +158,7 @@ const ManageTags = ({
   return (
     <div>
       <div className="mb-3">
-        <Label htmlFor="tags" labelText="Tags" />
+        <Label htmlFor={tagFieldId} labelText={labelText} />
         <div className="text-black flex flex-wrap mb-1">
           {currentTags.map((tagId) => {
             const tagItem: Tag | undefined = allTags.find(
@@ -174,7 +178,7 @@ const ManageTags = ({
         </div>
         <Input
           type={InputType.TEXT}
-          name="tags"
+          name={tagFieldId}
           placeholder="Tags"
           onChange={tagOnChange}
           reference={tagsInputRef}

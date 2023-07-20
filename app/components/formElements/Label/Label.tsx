@@ -1,8 +1,8 @@
 interface LabelProps {
-  htmlFor: string;
   labelText: string;
+  htmlFor: string;
 }
-const Label = ({ htmlFor, labelText }: LabelProps) => {
+const Label = ({ labelText, htmlFor }: LabelProps) => {
   return (
     <label htmlFor={htmlFor} className="pb-2 block">
       {labelText}
