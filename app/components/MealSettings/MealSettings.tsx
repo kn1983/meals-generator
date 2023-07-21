@@ -9,6 +9,7 @@ import {
   RemoveTagFromMealItemArgs,
 } from "../RandomizedMealsForm/RandomizedMealsForm";
 import { RefObject, useRef } from "react";
+import { PrimaryButton } from "../buttons/PrimaryButton/PrimaryButton";
 
 interface MealSettingsProps {
   difficultyLevels: DifficultyLevel[];
@@ -73,6 +74,9 @@ const MealSettings = ({
         labelText="Tags (optional)"
         tagFieldId={`tags_${mealItem.itemId}`}
       />
+      <div className="flex justify-end">
+        <PrimaryButton type="button" text="Generate" isSmall={true} />
+      </div>
     </div>
   );
 };

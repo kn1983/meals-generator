@@ -1,5 +1,5 @@
 "use client";
-import React, { MouseEventHandler, RefObject, useRef, useState } from "react";
+import React, { RefObject, useRef, useState } from "react";
 import { MealSettings } from "../MealSettings/MealSettings";
 import { FormElementWrapper } from "../formElements/FormElementWrapper/FormElementWrapper";
 import { Label } from "../formElements/Label/Label";
@@ -8,6 +8,7 @@ import { DifficultyLevel, Tag } from "@/app/randomizeMeals/page";
 import { PrimaryButton } from "../buttons/PrimaryButton/PrimaryButton";
 import { generateUniqueId } from "@/app/utils/generateUniqueId/generateUniqueId";
 import { SecondaryButton } from "../buttons/SecondaryButton/SecondaryButton";
+import { MealSuggestion } from "../MealSuggestion/MealSuggestion";
 
 export interface MealItem {
   itemId: string;
@@ -189,7 +190,13 @@ const RandomizedMealsForm = ({
     }
   };
 
-  const handleEditMealSettings = (mealId: string) => {};
+  const handleEditMealSettings = (mealId: string) => {
+    console.log("Edit");
+    const mealIndex = getMealIndexByMealId(mealId);
+    const newMealItems = [...mealItems];
+    newMealItems[mealIndex].mealSuggestion = null;
+    setMealItems(newMealItems);
+  };
 
   return (
     <>
@@ -210,7 +217,7 @@ const RandomizedMealsForm = ({
           <FormElementWrapper>
             <PrimaryButton
               type="button"
-              text="Generate meals"
+              text="Generate All"
               buttonOnClick={handleSubmitMealsForm}
             />
           </FormElementWrapper>
@@ -221,56 +228,11 @@ const RandomizedMealsForm = ({
         {mealItems.map((item, index) => {
           if (item.mealSuggestion) {
             return (
-              <div
-                className="bg-gray-900 border-2 border-pink-500 p-5 rounded-lg"
-                key={item.itemId}
-              >
-                <h2 className="text-xl mb-2 text-pink-500">
-                  {item.mealSuggestion?.title}
-                </h2>
-                <div className="mb-2 text-xs">
-                  <span className="font-bold">Difficulty level:</span>{" "}
-                  <span className="italic">
-                    {item.mealSuggestion.difficultyLevel}
-                  </span>
-                </div>
-                {item.mealSuggestion.tags.length > 0 && (
-                  <div className="flex text-xs ">
-                    <div className="mb-2 font-bold">Taggar:&nbsp;</div>
-                    <ul className="flex gap-x-2 flex-wrap">
-                      {item.mealSuggestion.tags.map((tag) => {
-                        return (
-                          <li key={tag._id} className="italic">
-                            {tag.tagName}
-                          </li>
-                        );
-                      })}
-                    </ul>
-                  </div>
-                )}
-                <div className="text-xs mb-2">
-                  <span className="font-bold">Author:</span>{" "}
-                  <span className="italic">
-                    {item.mealSuggestion.authorName}
-                  </span>
-                </div>
-                <div className="lg:flex lg:gap-x-3 lg:flex-row-reverse">
-                  <div className="order-2">
-                    <SecondaryButton
-                      type="button"
-                      text="Edit settings"
-                      isSmall={true}
-                    />
-                  </div>
-                  <div className="lg:order-1">
-                    <PrimaryButton
-                      type="button"
-                      text="Regenerate"
-                      isSmall={true}
-                    />
-                  </div>
-                </div>
-              </div>
+              <MealSuggestion
+                mealSuggestion={item.mealSuggestion}
+                mealItemId={item.itemId}
+                handleEditMealSettings={handleEditMealSettings}
+              />
             );
           } else {
             return (
