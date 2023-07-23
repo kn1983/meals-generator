@@ -317,6 +317,7 @@ const RandomizedMealsForm = ({
               <MealSuggestion
                 key={item.temporaryMealId}
                 mealItem={item}
+                allTags={allTags}
                 handleEditMealSettings={handleEditMealSettings}
                 handleRegenerate={handleRegenerateOne}
               />
