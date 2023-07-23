@@ -10,6 +10,7 @@ import {
 } from "../RandomizedMealsForm/RandomizedMealsForm";
 import { RefObject, useRef } from "react";
 import { PrimaryButton } from "../buttons/PrimaryButton/PrimaryButton";
+import { SecondaryButton } from "../buttons/SecondaryButton/SecondaryButton";
 
 interface MealSettingsProps {
   difficultyLevels: DifficultyLevel[];
@@ -21,6 +22,8 @@ interface MealSettingsProps {
   difficultyLevelOnChange: (
     event: React.ChangeEvent<HTMLSelectElement>
   ) => void;
+  handleGenerate: (temporaryMealId: string) => void;
+  handleEditCancel: (temporaryMealId: string) => void;
 }
 
 const MealSettings = ({
@@ -31,6 +34,8 @@ const MealSettings = ({
   addTagToMealItem,
   removeTagFromMealItem,
   difficultyLevelOnChange,
+  handleGenerate,
+  handleEditCancel,
 }: MealSettingsProps) => {
   const tagsInputRef: RefObject<HTMLInputElement> = useRef(null);
   const difficultyLevelItems = difficultyLevels.map((item, index) => {
@@ -42,11 +47,18 @@ const MealSettings = ({
   });
 
   const addTag = (tagId: string) => {
-    addTagToMealItem({ tagId, mealId: mealItem.itemId });
+    addTagToMealItem({ tagId, temporaryMealId: mealItem.temporaryMealId });
   };
 
   const removeTag = (tagId: string) => {
-    removeTagFromMealItem({ tagId: tagId, mealId: mealItem.itemId });
+    removeTagFromMealItem({
+      tagId: tagId,
+      temporaryMealId: mealItem.temporaryMealId,
+    });
+  };
+
+  const shouldDisplayCancelButton = () => {
+    return mealItem.mealSuggestion !== null;
   };
 
   return (
@@ -55,11 +67,11 @@ const MealSettings = ({
 
       <FormElementWrapper>
         <Label
-          htmlFor={`difficultyLevel_${mealItem.itemId}`}
+          htmlFor={`difficultyLevel_${mealItem.temporaryMealId}`}
           labelText="Difficulty level"
         />
         <Select
-          name={`difficultyLevel_${mealItem.itemId}`}
+          name={`difficultyLevel_${mealItem.temporaryMealId}`}
           items={difficultyLevelItems}
           value={mealItem.difficulityLevel}
           onChange={difficultyLevelOnChange}
@@ -72,10 +84,28 @@ const MealSettings = ({
         removeTag={removeTag}
         tagsInputRef={tagsInputRef}
         labelText="Tags (optional)"
-        tagFieldId={`tags_${mealItem.itemId}`}
+        tagFieldId={`tags_${mealItem.temporaryMealId}`}
       />
-      <div className="flex justify-end">
-        <PrimaryButton type="button" text="Generate" isSmall={true} />
+
+      <div className="flex gap-3 flex-col lg:flex-row-reverse">
+        {shouldDisplayCancelButton() && (
+          <div className="order-2">
+            <SecondaryButton
+              type="button"
+              text="Cancel"
+              isSmall={true}
+              buttonOnClick={() => handleEditCancel(mealItem.temporaryMealId)}
+            />
+          </div>
+        )}
+        <div className="lg:order-1">
+          <PrimaryButton
+            type="button"
+            text="Generate new meal"
+            isSmall={true}
+            buttonOnClick={() => handleGenerate(mealItem.temporaryMealId)}
+          />
+        </div>
       </div>
     </div>
   );

@@ -42,10 +42,11 @@ export default async function Page() {
   ): MealItem[] => {
     const meals: MealItem[] = new Array(initialMealsCount).fill("").map((_) => {
       return {
-        itemId: generateUniqueId(),
+        temporaryMealId: generateUniqueId(),
         tags: [],
         difficulityLevel: defaultLevel,
         mealSuggestion: null,
+        editSettingsMode: true,
       };
     });
     return meals;
