@@ -55,7 +55,7 @@ const MealSuggestion = ({
           <div>
             <div className="mb-2 text-xs">
               <span className="font-bold">Difficulty level:</span>{" "}
-              <span className="italic">Easy</span>
+              <span className="italic">{mealItem.difficulityLevel.level}</span>
             </div>
             <div className="mb-2 text-xs">
               <span className="font-bold">Tags</span>

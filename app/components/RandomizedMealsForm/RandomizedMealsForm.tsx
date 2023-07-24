@@ -164,7 +164,6 @@ const RandomizedMealsForm = ({
   };
 
   const handleGenerateNewMeals = async (e: React.MouseEvent<HTMLElement>) => {
-    console.log(mealItems);
     e.preventDefault();
 
     try {
@@ -186,20 +185,54 @@ const RandomizedMealsForm = ({
         if (!response.ok) {
           throw new Error("Hej apa");
         }
-        const fetchedRandomizedMealItems: RandomizedMealItem[] =
+
+        const randomizedMeals: { [key: string]: RandomizedMealItem } =
           await response.json();
 
         const newMealItems = [...mealItems];
 
-        fetchedRandomizedMealItems.forEach((fetchedMealItem, index) => {
-          newMealItems[index].mealSuggestion = fetchedMealItem;
-          newMealItems[index].editSettingsMode = false;
+        Object.keys(randomizedMeals).forEach((key) => {
+          const randomizedMealItem: RandomizedMealItem = randomizedMeals[key];
+          const mealIndex = getMealIndexByMealId(key);
+          newMealItems[mealIndex].mealSuggestion = randomizedMealItem;
+          newMealItems[mealIndex].editSettingsMode = false;
         });
 
         setMealItems(newMealItems);
       }
     } catch (error) {
       console.log(error);
+    }
+  };
+
+  const handleRegenerateOne = async (temporaryMealId: string) => {
+    const currentMealIndex: number = getMealIndexByMealId(temporaryMealId);
+    const response = await fetch("http://localhost:3000/api/mealsBySettings", {
+      method: "POST",
+      body: JSON.stringify({
+        mealItems: [mealItems[currentMealIndex]],
+        mealsCount: 1,
+      }),
+      headers: {
+        "content-type": "application/json",
+      },
+    });
+
+    if (response.status === 200) {
+      if (!response.ok) {
+        throw new Error("Hej apa");
+      }
+      const randomizedMeals: { [key: string]: RandomizedMealItem } =
+        await response.json();
+
+      const newMealItems = [...mealItems];
+      const randomizedMealItem: RandomizedMealItem =
+        randomizedMeals[temporaryMealId];
+      const mealIndex = getMealIndexByMealId(temporaryMealId);
+      newMealItems[mealIndex].mealSuggestion = randomizedMealItem;
+      newMealItems[mealIndex].editSettingsMode = false;
+
+      setMealItems(newMealItems);
     }
   };
 
@@ -231,37 +264,6 @@ const RandomizedMealsForm = ({
     const newMealItems = [...mealItems];
     newMealItems[currentMealIndex].editSettingsMode = false;
     setMealItems(newMealItems);
-  };
-
-  const handleRegenerateOne = async (temporaryMealId: string) => {
-    const currentMealIndex: number = getMealIndexByMealId(temporaryMealId);
-    const response = await fetch("http://localhost:3000/api/mealsBySettings", {
-      method: "POST",
-      body: JSON.stringify({
-        mealItems: [mealItems[currentMealIndex]],
-        mealsCount: 1,
-      }),
-      headers: {
-        "content-type": "application/json",
-      },
-    });
-
-    if (response.status === 200) {
-      if (!response.ok) {
-        throw new Error("Hej apa");
-      }
-      const fetchedRandomizedMealItems: RandomizedMealItem[] =
-        await response.json();
-
-      const newMealItems = [...mealItems];
-
-      newMealItems[currentMealIndex].mealSuggestion =
-        fetchedRandomizedMealItems[0];
-
-      newMealItems[currentMealIndex].editSettingsMode = false;
-
-      setMealItems(newMealItems);
-    }
   };
 
   return (
@@ -306,7 +308,7 @@ const RandomizedMealsForm = ({
           if (item.editSettingsMode === true) {
             return (
               <MealSettings
-                key={item.temporaryMealId}
+                key={`${item.temporaryMealId}_mealSetting`}
                 mealItem={item}
                 difficultyLevels={difficultyLevels}
                 mealTitle={`Meal ${index + 1}, Settings`}
@@ -321,7 +323,7 @@ const RandomizedMealsForm = ({
           } else {
             return (
               <MealSuggestion
-                key={item.temporaryMealId}
+                key={`${item.temporaryMealId}_mealSuggestion`}
                 mealItem={item}
                 allTags={allTags}
                 handleEditMealSettings={handleEditMealSettings}
