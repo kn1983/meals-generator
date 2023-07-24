@@ -12,7 +12,7 @@ import { MealSuggestion } from "../MealSuggestion/MealSuggestion";
 export interface MealItem {
   temporaryMealId: string;
   tags: string[];
-  difficulityLevel: string;
+  difficulityLevel: DifficultyLevel;
   mealSuggestion: RandomizedMealItem | null;
   editSettingsMode: boolean;
 }
@@ -21,7 +21,7 @@ interface RandomizedMealsFormProps {
   initialMealsCount: number;
   initialMeals: MealItem[];
   difficultyLevels: DifficultyLevel[];
-  defaultLevel: string;
+  defaultLevel: DifficultyLevel;
   initialTags: Tag[];
 }
 
@@ -154,11 +154,17 @@ const RandomizedMealsForm = ({
     const temporaryMealId: string = fieldName?.split("_").pop() || "";
     const mealIndex = getMealIndexByMealId(temporaryMealId);
     const newMealItems: MealItem[] = [...mealItems];
-    newMealItems[mealIndex].difficulityLevel = event.target.value;
+    newMealItems[mealIndex].difficulityLevel =
+      difficultyLevels.find((item) => {
+        if (item._id === event.target.value) {
+          return item;
+        }
+      }) || difficultyLevels[0];
     setMealItems(newMealItems);
   };
 
   const handleGenerateNewMeals = async (e: React.MouseEvent<HTMLElement>) => {
+    console.log(mealItems);
     e.preventDefault();
 
     try {

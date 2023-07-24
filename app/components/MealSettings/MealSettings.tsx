@@ -73,7 +73,7 @@ const MealSettings = ({
         <Select
           name={`difficultyLevel_${mealItem.temporaryMealId}`}
           items={difficultyLevelItems}
-          value={mealItem.difficulityLevel}
+          value={mealItem.difficulityLevel._id}
           onChange={difficultyLevelOnChange}
         />
       </FormElementWrapper>

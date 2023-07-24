@@ -38,7 +38,7 @@ export default async function Page() {
 
   const generateInitialMeals = (
     initialMealsCount: number,
-    defaultLevel: string
+    defaultLevel: DifficultyLevel
   ): MealItem[] => {
     const meals: MealItem[] = new Array(initialMealsCount).fill("").map((_) => {
       return {
@@ -52,9 +52,13 @@ export default async function Page() {
     return meals;
   };
 
-  const difficultyLevels = await fetchDifficultyLevels();
-  const defaultLevel =
-    difficultyLevels.find((item) => item.level === "Easy")?._id || "";
+  const difficultyLevels: DifficultyLevel[] = await fetchDifficultyLevels();
+  const defaultLevel: DifficultyLevel =
+    difficultyLevels.find((item) => {
+      if (item.level === "Easy") {
+        return item;
+      }
+    }) || difficultyLevels[0];
   const initialMeals = generateInitialMeals(initialMealsCount, defaultLevel);
   const allTags = await fetchTags();
 
