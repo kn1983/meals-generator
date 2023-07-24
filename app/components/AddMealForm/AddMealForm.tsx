@@ -55,6 +55,7 @@ const AddMealsForm = ({
           mealRef.current.value = "";
           authorRef.current.value = "";
           difficultyLevelRef.current.value = "";
+          setCurrentMealTags([]);
         }
       } catch (error) {
         console.log(error);

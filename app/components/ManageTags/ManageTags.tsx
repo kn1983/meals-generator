@@ -117,6 +117,7 @@ const ManageTags = ({
   ) => {
     const tagToAdd = tagsInputRef.current?.value;
     if (event.key === "Enter" && tagToAdd) {
+      event.preventDefault();
       const matchingTags = checkMatchingTags(tagToAdd.toLocaleLowerCase());
       resetTagInputAndSuggestions();
       if (matchingTags.length > 0) {
